@@ -1,0 +1,45 @@
+{
+  "name": "smart_contract",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "NODE_ENV=production node dist/lib/index.js",
+    "serve": "nodemon lib/index.js",
+    "lint": "eslint .",
+    "build": "webpack",
+    "build:watch": "yarn build -- --watch",
+    "build:production": "NODE_ENV=production webpack; babel lib -d dist/lib",
+    "init": "truffle init",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate --reset"
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-router-dom": "^5.0.0",
+    "styled-components": "^4.2.0",
+    "truffle": "^5.0.15"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-latest": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.9",
+    "eslint": "^4.16.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.6.1",
+    "nodemon": "^1.14.11",
+    "style-loader": "^0.20.1",
+    "webpack": "^3.10.0"
+  }
+}

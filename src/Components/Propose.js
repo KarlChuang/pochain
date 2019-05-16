@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
+import ProposeImg from './ProposeImg';
+
 const Wrapper = styled.div`
   width: inherit;
   /* text-align: center; */
@@ -8,93 +10,129 @@ const Wrapper = styled.div`
   flex-grow: 1;
   flex-direction: column;
   padding-top: 130px;
-  padding-bottom: 50px;
   align-items: center;
+  margin-bottom: 50px;
 `;
 
-const ImgProposeBlock = styled.div`
+const ProposeDetail = styled.div`
   width: 100%;
   display: flex;
-  flex-direction: row;
-`;
-
-const ImgInputBox = styled.div`
-  width: 300px;
-  height: 300px;
-  margin: 10px;
-  margin-left: 50px;
-  background-color: #c5c5c51c;
-  border: 5px solid #5f809054;
-  transition: .3s;
-  :hover {
-    background-color: #5b7c8c9e;
-    border: 5px solid #5f809000;
-    transition: .3s;
-  }
-`;
-
-const ImgForm = styled.form`
+  flex-direction: column;
   align-items: center;
+  padding-top: 50px;
+`;
+
+const ProposeBlock = styled.div`
+  width: 80%
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 50px;
+`;
+
+const Title = styled.div`
+  height: 100%;
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  font-family: 'Neucha', cursive;
+`;
+
+const TitleInput = styled.input`
+  flex-grow: 1;
+  height: 100%;
+  border: 2px solid;
+  border-radius: 8px;
+  font-size: 22px;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-family: 'Neucha', cursive;
+  letter-spacing: 1.5px;
+`;
+
+const ProposeBlockDescription = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  width: 80%;
+  margin-top: 40px;
+  margin-bottom: 30px;
+`;
+
+const DescriptionInput = styled.textarea`
+  margin-top: 20px;
+  border: 2px solid;
+  border-radius: 8px;
+  resize: none;
+  height: 300px;
+  font-size: 22px;
+  padding: 10px;
+  font-family: 'Neucha', cursive;
+  letter-spacing: 1.5px;
+`;
+
+const ButtonBlock = styled(ProposeBlock)`
   justify-content: space-around;
 `;
 
-const ImgInput = styled.input`
-  width: 300px;
-  height: 300px;
-  display: inline-block;
+const Button = styled.button`
+  border: 0;
+  background-color: gray;
+  font-family: 'Neucha', cursive;
+  background-color: #bfbfbf;
+  border-radius: 7px;
+  font-size: 24px;
+  width: 250px;
+  height: 35px;
+  transition: .3s;
   cursor: pointer;
-  opacity: 0;
-`;
-
-const Img = styled.img`
-  height: 300px;
-  margin: 10px;
-  min-height: 300px;
-`;
-
-const Icon = styled.i`
-  font-size: 120px;
-  position: absolute;;
-  margin: auto;
-  color: #dde2e4;
+  :hover {
+    background-color: #4e5f67d1;
+    color: white;
+    transition: .3s;
+  }
 `;
 
 class Propose extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      files: [],
-      imagePreviewUrls: [],
+      productName: '',
+      productDescription: '',
     };
-    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleTitleChange = this.handleTitleChange.bind(this);
+    this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
   }
-  handleInputChange(e) {
-    e.preventDefault();
-    const reader = new FileReader();
-    const file = e.target.files[0];
-    reader.onloadend = () => {
-      this.setState({
-        files: [...this.state.files, file],
-        imagePreviewUrls: [...this.state.imagePreviewUrls, reader.result],
-      });
-    };
-    reader.readAsDataURL(file);
+  handleTitleChange(e) {
+    this.setState({
+      productName: e.target.value,
+    });
+  }
+  handleDescriptionChange(e) {
+    this.setState({
+      productDescription: e.target.value,
+    });
   }
   render() {
+    const { productName, productDescription } = this.state;
     return (
       <Wrapper>
-        <ImgProposeBlock>
-          <ImgInputBox>
-            <ImgForm>
-              <Icon className="fas fa-camera" />
-              <ImgInput name="Product_img" type="file" accept="image/gif, image/jpeg, image/png" onChange={this.handleInputChange} />
-            </ImgForm>
-          </ImgInputBox>
-          {
-            this.state.imagePreviewUrls.map(url => (<Img src={url} key={url} alt={url} />))
-          }
-        </ImgProposeBlock>
+        <ProposeImg />
+        <ProposeDetail>
+          <ProposeBlock>
+            <Title>Product Name</Title>
+            <TitleInput onChange={this.handleTitleChange} value={productName} />
+          </ProposeBlock>
+          <ProposeBlockDescription>
+            <Title>Product Description</Title>
+            <DescriptionInput onChange={this.handleDescriptionChange} value={productDescription} />
+          </ProposeBlockDescription>
+        </ProposeDetail>
+        <ButtonBlock>
+          <Button>save</Button>
+          <Button>commit</Button>
+        </ButtonBlock>
       </Wrapper>
     );
   }

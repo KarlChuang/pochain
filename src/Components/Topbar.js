@@ -13,6 +13,7 @@ const Topbarwrapper = styled.div`
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
+  z-index: 1;  
 `;
 
 const Title = styled(Link)`

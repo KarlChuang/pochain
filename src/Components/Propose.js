@@ -28,6 +28,7 @@ const ProposeBlock = styled.div`
   flex-direction: row;
   align-items: center;
   height: 50px;
+  margin-top: 40px;
 `;
 
 const Title = styled.div`
@@ -99,14 +100,21 @@ class Propose extends Component {
     super(props);
     this.state = {
       productName: '',
+      productDeadline: '',
       productDescription: '',
     };
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
   }
   handleTitleChange(e) {
     this.setState({
       productName: e.target.value,
+    });
+  }
+  handleDateChange(e) {
+    this.setState({
+      productDeadline: e.target.value,
     });
   }
   handleDescriptionChange(e) {
@@ -115,7 +123,7 @@ class Propose extends Component {
     });
   }
   render() {
-    const { productName, productDescription } = this.state;
+    const { productName, productDeadline, productDescription } = this.state;
     return (
       <Wrapper>
         <ProposeImg />
@@ -123,6 +131,10 @@ class Propose extends Component {
           <ProposeBlock>
             <Title>Product Name</Title>
             <TitleInput onChange={this.handleTitleChange} value={productName} />
+          </ProposeBlock>
+          <ProposeBlock>
+            <Title>Deadline</Title>
+            <TitleInput type="date" onChange={this.handleDateChange} value={productDeadline} />
           </ProposeBlock>
           <ProposeBlockDescription>
             <Title>Product Description</Title>

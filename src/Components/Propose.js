@@ -171,6 +171,8 @@ class Propose extends Component {
     formData.append('productName', productName);
     formData.append('productDeadline', productDeadline);
     formData.append('productDescription', productDescription);
+    // TODO: producer
+    formData.append('producer', 'Karl');
     productImg.files.forEach(file => formData.append('t', file));
     const res = await fetch('/api/new-product', {
       method: 'POST',

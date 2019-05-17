@@ -36,7 +36,7 @@ const ProductBrief = styled.div`
 
 const ProductImg = styled.img`
   width: 440px;
-  height: 440px;
+  min-width: 440px;
   margin: 10px;
 `;
 
@@ -115,13 +115,23 @@ class ProductPage extends Component {
       producer: '',
       deadline: '',
       description: '',
+      images: [],
     };
   }
   async componentDidMount() {
     let res = await fetch(`/api/product/${this.state.id}`);
     res = await res.json();
+    let imgRes = await fetch(`/api/product_img/${this.state.id}`);
+    imgRes = await imgRes.json();
+    const images = [];
+    for (let i = 0; i < imgRes.length; i += 1) {
+      const image = btoa(String.fromCharCode.apply(null, imgRes[i].image.data));
+      images.push(`data:image/png;base64,${image}`);
+    }
+    // console.log(imgRes);
     this.setState({
       ...res[0],
+      images,
     });
   }
   render() {
@@ -130,12 +140,13 @@ class ProductPage extends Component {
       producer,
       deadline,
       description,
+      images,
     } = this.state;
     return (
       <Wrapper>
         <ProductName>{name}</ProductName>
         <ProductBrief>
-          <ProductImg />
+          <ProductImg src={images[0]} />
           <ProductDiscription>
             <ProductOwner>Producer: {producer}</ProductOwner>
             <ProductOwner>Deadline: {toLocalDateString(deadline)}</ProductOwner>

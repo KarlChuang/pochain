@@ -6,6 +6,7 @@ const ImgProposeBlock = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  overflow-x: scroll;
 `;
 
 const ImgInputBox = styled.div`
@@ -19,6 +20,7 @@ const ImgInputBox = styled.div`
   align-items: center;
   display: flex;
   justify-content: space-around;
+  position: relative;
   :hover {
     background-color: #5b7c8c9e;
     border: 5px solid #5f809000;
@@ -42,6 +44,7 @@ const ImgBox = styled.div`
   justify-content: space-around;
   margin: 10px;
   cursor: pointer;
+  position: relative;
 `;
 
 const Img = styled.img`
@@ -64,62 +67,30 @@ const ImgDeleteIcon = styled.i`
 
 const Icon = styled.i`
   font-size: 120px;
-  position: absolute;;
+  position: absolute;
   margin: auto;
   color: #dde2e4;
 `;
 
-class ProposeImg extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      files: [],
-      imagePreviewUrls: [],
-    };
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleImgDelete = this.handleImgDelete.bind(this);
-  }
-  handleInputChange(e) {
-    e.preventDefault();
-    const reader = new FileReader();
-    const file = e.target.files[0];
-    reader.onloadend = () => {
-      this.setState({
-        files: [...this.state.files, file],
-        imagePreviewUrls: [...this.state.imagePreviewUrls, reader.result],
-      });
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  }
-  handleImgDelete(e) {
-    const arr = [...this.state.imagePreviewUrls];
-    const files = [...this.state.files];
-    const index = arr.indexOf(e.target.src);
-    if (index !== -1) {
-      arr.splice(index, 1);
-      files.splice(index, 1);
-      this.setState({ imagePreviewUrls: arr, files });
+const ProposeImg = ({
+  imagePreviewUrls,
+  handleImgAdd,
+  handleImgDelete,
+}) => (
+  <ImgProposeBlock>
+    <ImgInputBox>
+      <Icon className="fas fa-camera" />
+      <ImgInput name="Product_img" type="file" accept="image/gif, image/jpeg, image/png" onChange={handleImgAdd} />
+    </ImgInputBox>
+    {
+      imagePreviewUrls.map(url => (
+        <ImgBox key={url}>
+          <ImgDeleteIcon className="fas fa-trash-alt" />
+          <Img src={url} onClick={handleImgDelete} />
+        </ImgBox>
+      ))
     }
-  }
-  render() {
-    return (
-      <ImgProposeBlock>
-        <ImgInputBox>
-          <Icon className="fas fa-camera" />
-          <ImgInput name="Product_img" type="file" accept="image/gif, image/jpeg, image/png" onChange={this.handleInputChange} />
-        </ImgInputBox>
-        {
-          this.state.imagePreviewUrls.map(url => (
-            <ImgBox key={url}>
-              <ImgDeleteIcon className="fas fa-trash-alt" />
-              <Img src={url} alt={url} onClick={this.handleImgDelete} />
-            </ImgBox>
-          ))
-        }
-      </ImgProposeBlock>
-    );
-  }
-}
+  </ImgProposeBlock>
+);
 
 export default ProposeImg;

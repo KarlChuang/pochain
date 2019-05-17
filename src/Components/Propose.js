@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import fetch from 'isomorphic-fetch';
 
 import ProposeImg from './ProposeImg';
 
@@ -23,7 +24,7 @@ const ProposeDetail = styled.div`
 `;
 
 const ProposeBlock = styled.div`
-  width: 80%
+  width: 80%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -102,10 +103,47 @@ class Propose extends Component {
       productName: '',
       productDeadline: '',
       productDescription: '',
+      productImg: {
+        files: [],
+        urls: [],
+      },
     };
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleCommit = this.handleCommit.bind(this);
+    this.handleImgAdd = this.handleImgAdd.bind(this);
+    this.handleImgDelete = this.handleImgDelete.bind(this);
+  }
+  handleImgAdd(e) {
+    e.preventDefault();
+    const reader = new FileReader();
+    const file = e.target.files[0];
+    reader.onloadend = () => {
+      this.setState({
+        productImg: {
+          files: [...this.state.productImg.files, file],
+          urls: [...this.state.productImg.urls, reader.result],
+        },
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+  handleImgDelete(e) {
+    const arr = [...this.state.productImg.urls];
+    const files = [...this.state.productImg.files];
+    const index = arr.indexOf(e.target.src);
+    if (index !== -1) {
+      arr.splice(index, 1);
+      files.splice(index, 1);
+      this.setState({
+        productImg: {
+          urls: arr,
+          files,
+        },
+      });
+    }
   }
   handleTitleChange(e) {
     this.setState({
@@ -122,11 +160,39 @@ class Propose extends Component {
       productDescription: e.target.value,
     });
   }
+  async handleCommit() {
+    const {
+      productName,
+      productDeadline,
+      productDescription,
+      productImg,
+    } = this.state;
+    const formData = new FormData();
+    formData.append('productName', productName);
+    formData.append('productDeadline', productDeadline);
+    formData.append('productDescription', productDescription);
+    productImg.files.forEach(file => formData.append('t', file));
+    const res = await fetch('/api/new-product', {
+      method: 'POST',
+      body: formData,
+    });
+    const message = await res.text();
+    console.log(message);
+  }
   render() {
-    const { productName, productDeadline, productDescription } = this.state;
+    const {
+      productName,
+      productDeadline,
+      productDescription,
+      productImg,
+    } = this.state;
     return (
       <Wrapper>
-        <ProposeImg />
+        <ProposeImg
+          imagePreviewUrls={productImg.urls}
+          handleImgAdd={this.handleImgAdd}
+          handleImgDelete={this.handleImgDelete}
+        />
         <ProposeDetail>
           <ProposeBlock>
             <Title>Product Name</Title>
@@ -143,7 +209,7 @@ class Propose extends Component {
         </ProposeDetail>
         <ButtonBlock>
           <Button>save</Button>
-          <Button>commit</Button>
+          <Button onClick={this.handleCommit}>commit</Button>
         </ButtonBlock>
       </Wrapper>
     );

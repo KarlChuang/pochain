@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
+import fetch from 'isomorphic-fetch';
+import { withRouter } from 'react-router-dom';
 
 import { toLocalDateString } from '../util/utils';
 import CommentList from './CommentList';
@@ -70,7 +71,7 @@ const ProductBriefDetail = styled.div`
 
 const SplitLine = styled.hr`
   width: 60%;
-  transform: ${({ right }) => (right ? 'rotate(4deg)' : 'rotate(-4deg)')};
+  transform: ${({ right }) => (right ? 'rotate(2deg)' : 'rotate(-2deg)')};
   margin-top: 0.3em;
   margin-bottom: 2em;
   opacity: .6;
@@ -95,38 +96,62 @@ const Button = styled.button`
   border: none;
   border-radius: 7px;
   font-family: 'Righteous', cursive;
-  transition: .3s
+  transition: .3s;
   :hover {
     background-color: #888888;
     color: #ededed;
-    transition: .3s
+    transition: .3s;
   }
 `;
 
-const ProductPage = ({ name = 'Apple', producer = 'Karl', deadline = Date.now(), detail = 'TTT'  }) => (
-  <Wrapper>
-    <ProductName>{name}</ProductName>
-    <ProductBrief>
-      <ProductImg />
-      <ProductDiscription>
-        <ProductOwner>Producer: {producer}</ProductOwner>
-        <ProductOwner>Deadline: {toLocalDateString(deadline)}</ProductOwner>
-        <ProductBriefDetail>{detail}</ProductBriefDetail>
-        <Buttons>
-          <Button>Pre-order</Button>
-        </Buttons>
-      </ProductDiscription>
-    </ProductBrief>
-    <SplitLine />
-    <CommentList />
-  </Wrapper>
-);
+class ProductPage extends Component {
+  constructor(props) {
+    super(props);
+    const { location } = this.props;
+    console.log();
+    this.state = {
+      id: parseInt(location.pathname.split('/')[2], 10),
+      name: '',
+      producer: '',
+      deadline: '',
+      description: '',
+    };
+  }
+  async componentDidMount() {
+    let res = await fetch(`/api/product/${this.state.id}`);
+    res = await res.json();
+    this.setState({
+      ...res[0],
+    });
+  }
+  render() {
+    const {
+      name,
+      producer,
+      deadline,
+      description,
+    } = this.state;
+    return (
+      <Wrapper>
+        <ProductName>{name}</ProductName>
+        <ProductBrief>
+          <ProductImg />
+          <ProductDiscription>
+            <ProductOwner>Producer: {producer}</ProductOwner>
+            <ProductOwner>Deadline: {toLocalDateString(deadline)}</ProductOwner>
+            <ProductBriefDetail>{description}</ProductBriefDetail>
+            <Buttons>
+              <Button>Pre-order</Button>
+            </Buttons>
+          </ProductDiscription>
+        </ProductBrief>
+        <SplitLine />
+        <CommentList />
+      </Wrapper>
+    );
+  }
+}
 
-ProductPage.propTypes = {
-  name: PropTypes.string.isRequired,
-  producer: PropTypes.string.isRequired,
-  deadline: PropTypes.number.isRequired,
-  detail: PropTypes.string.isRequired,
-};
+const ProductPageRouter = withRouter(props => <ProductPage {...props} />);
 
-export default ProductPage;
+export default ProductPageRouter;

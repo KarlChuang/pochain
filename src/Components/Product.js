@@ -60,12 +60,13 @@ const ProductDetail = styled.div`
 `;
 
 const ProductList = ({
+  id,
   name,
   producer,
   deadline,
   detail,
 }) => (
-  <Productwrapper to="/product">
+  <Productwrapper to={`/product/${id}`}>
     <ProductImg />
     <ProductDiscription>
       <ProductName>{name}</ProductName>
@@ -77,6 +78,7 @@ const ProductList = ({
 );
 
 ProductList.propTypes = {
+  id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   producer: PropTypes.string.isRequired,
   deadline: PropTypes.number.isRequired,

@@ -162,7 +162,6 @@ class Propose extends Component {
         this.setState({
           productImg,
         });
-        console.log(this.state.productImg);
       }
     }
   }

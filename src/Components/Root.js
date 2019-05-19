@@ -65,7 +65,7 @@ class Root extends Component {
         <Rootwrapper>
           <Topbar account={account} />
           <Route path="/" exact component={ProductList} />
-          <Route path="/product" component={ProductPage} />
+          <Route path="/product" component={() => <ProductPage account={account} detectAccountChange={this.detectAccountChange} />} />
           <Route path="/propose" component={() => <Porpose account={account} detectAccountChange={this.detectAccountChange} />} />
           <Route path="/login" component={Login} />
           <Route path="/user" component={() => <PersonalPage account={account} detectAccountChange={this.detectAccountChange} />} />

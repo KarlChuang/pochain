@@ -90,6 +90,7 @@ class PersonalPage extends Component {
     this.state = {
       products: [],
     };
+    this.handleProductDelete = this.handleProductDelete.bind(this);
   }
   async componentDidMount() {
     let res = await fetch(`/api/user/${this.props.account}`);
@@ -97,6 +98,28 @@ class PersonalPage extends Component {
     this.setState({
       products: res,
     });
+  }
+  async handleProductDelete(productId) {
+    let res = await fetch('/api/delete-product', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productId,
+      }),
+    });
+    res = await res.text();
+    console.log(res);
+    if (res === 'success') {
+      alert('Success');
+      this.setState({
+        products: this.state.products.filter(({ id }) => id !== productId),
+      });
+    } else {
+      alert('Unexpected error');
+    }
   }
   render() {
     const { products } = this.state;
@@ -116,7 +139,7 @@ class PersonalPage extends Component {
                 <ProductIconBlock to={`/propose/${id}`}>
                   <ProductIcon className="fas fa-edit" />
                 </ProductIconBlock>
-                <ProductIconBlock right={1} to={`/user/${producer}`}>
+                <ProductIconBlock right={1} to={`/user/${producer}`} onClick={() => this.handleProductDelete(id)}>
                   <ProductIcon className="fas fa-trash-alt" />
                 </ProductIconBlock>
                 <Product

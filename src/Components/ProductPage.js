@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import fetch from 'isomorphic-fetch';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 
 import { toLocalDateString } from '../util/utils';
 import CommentList from './CommentList';
@@ -140,6 +140,26 @@ const Button = styled.button`
   }
 `;
 
+const ButtonLink = styled(Link)`
+  background-color: #ededed;
+  font-size: 18px;
+  height: 35px;
+  border: none;
+  border-radius: 7px;
+  font-family: 'Righteous', cursive;
+  transition: .3s;
+  text-decoration: none;
+  color: black;
+  padding: 1px 7px 2px;
+  align-items: center;
+  display: flex;
+  :hover {
+    background-color: #888888;
+    color: #ededed;
+    transition: .3s;
+  }
+`;
+
 class ProductPage extends Component {
   constructor(props) {
     super(props);
@@ -157,6 +177,8 @@ class ProductPage extends Component {
     this.handleImgLeftClick = this.handleImgLeftClick.bind(this);
   }
   async componentDidMount() {
+    const { detectAccountChange } = this.props;
+    detectAccountChange();
     let res = await fetch(`/api/product/${this.state.id}`);
     res = await res.json();
     let imgRes = await fetch(`/api/product_img/${this.state.id}`);
@@ -193,6 +215,7 @@ class ProductPage extends Component {
   }
   render() {
     const {
+      id,
       name,
       producer,
       deadline,
@@ -215,6 +238,11 @@ class ProductPage extends Component {
             <ProductBriefDetail>{description}</ProductBriefDetail>
             <Buttons>
               <Button>Pre-order</Button>
+              {
+                (this.props.account === producer) ? (
+                  <ButtonLink to={`/propose/${id}`}>Edit</ButtonLink>
+                ) : ('')
+              }
             </Buttons>
           </ProductDiscription>
         </ProductBrief>

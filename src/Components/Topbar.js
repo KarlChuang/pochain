@@ -60,10 +60,10 @@ const Topbar = ({ location, account }) => (
   <Topbarwrapper>
     <Title to="/">PoChain</Title>
     <ToolDiv>
-      <Tool to="/propose/" label="/propose/" page={location.pathname}>PROPOSE</Tool>
+      <Tool to="/propose/" label="propose" page={location.pathname.split('/')[1]}>PROPOSE</Tool>
       {
         (account === 'LOGIN') ? (
-          <Tool to="/login/" label="/login/" page={location.pathname}>{account}</Tool>
+          <Tool to="/login/" label="login" page={location.pathname.split('/')[1]}>{account}</Tool>
         ) : (
           <Tool to={`/user/${account}/`} label={`/user/${account}/`} page={location.pathname}>{account}</Tool>
         )

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 const ImgProposeBlock = styled.div`
@@ -7,6 +7,7 @@ const ImgProposeBlock = styled.div`
   flex-direction: row;
   align-items: center;
   overflow-x: scroll;
+  flex-shrink: 0;
 `;
 
 const ImgInputBox = styled.div`
@@ -49,7 +50,7 @@ const ImgBox = styled.div`
 
 const Img = styled.img`
   height: 300px;
-  min-height: 300px;
+  width: auto;
   opacity: 1;
   transition: .3s;
   :hover {
@@ -59,7 +60,7 @@ const Img = styled.img`
 `;
 
 const ImgDeleteIcon = styled.i`
-  font-size: 120px;
+  font-size: 100px;
   position: absolute;
   color: #0c0e0ebf;
   z-index: -1;

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import fetch from 'isomorphic-fetch';
+import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 
 import ProposeImg from './ProposeImg';
 
@@ -21,6 +23,7 @@ const ProposeDetail = styled.div`
   flex-direction: column;
   align-items: center;
   padding-top: 50px;
+  flex-shrink: 0;
 `;
 
 const ProposeBlock = styled.div`
@@ -76,6 +79,7 @@ const DescriptionInput = styled.textarea`
 
 const ButtonBlock = styled(ProposeBlock)`
   justify-content: space-around;
+  flex-shrink: 0;
 `;
 
 const Button = styled.button`
@@ -96,9 +100,25 @@ const Button = styled.button`
   }
 `;
 
+// const AlertBox = styled.div`
+//   position: fixed;
+//   font-size: 25px;
+//   top: 40%;
+//   background-color: #21212182;
+//   color: white;
+//   padding-left: 60px;
+//   padding-right: 60px;
+//   padding-top: 6px;
+//   border-radius: 15px;
+//   font-family: 'Neucha', cursive;
+//   opacity: ${({ show }) => (show ? 1 : 0)};
+// `;
+
 class Propose extends Component {
   constructor(props) {
     super(props);
+    const { detectAccountChange } = this.props;
+    detectAccountChange();
     this.state = {
       productName: '',
       productDeadline: '',
@@ -111,9 +131,40 @@ class Propose extends Component {
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
-    this.handleCommit = this.handleCommit.bind(this);
+    this.handleSave = this.handleSave.bind(this);
     this.handleImgAdd = this.handleImgAdd.bind(this);
     this.handleImgDelete = this.handleImgDelete.bind(this);
+  }
+  async componentDidMount() {
+    const { location } = this.props;
+    const productId = location.pathname.split('/')[2];
+    if (productId.length > 0) {
+      let res = await fetch(`/api/product/${productId}`);
+      const fileResponse = await res.json();
+      res = await fetch(`/api/product_img/${productId}`);
+      const imageResponse = await res.json();
+      if (fileResponse[0].producer !== this.props.account) {
+        window.location.replace(`/user/${fileResponse[0].producer}`);
+      } else {
+        this.setState({
+          productName: fileResponse[0].name,
+          productDeadline: fileResponse[0].deadline.split('T')[0],
+          productDescription: fileResponse[0].description,
+        });
+        const productImg = {
+          files: [],
+          urls: [],
+        };
+        for (let i = 0; i < imageResponse.length; i += 1) {
+          productImg.urls.push(`data:image/png;base64,${btoa(String.fromCharCode.apply(null, imageResponse[i].image.data))}`);
+          productImg.files.push(imageResponse[i].id);
+        }
+        this.setState({
+          productImg,
+        });
+        console.log(this.state.productImg);
+      }
+    }
   }
   handleImgAdd(e) {
     e.preventDefault();
@@ -130,6 +181,7 @@ class Propose extends Component {
     reader.readAsDataURL(file);
     e.target.value = '';
   }
+
   handleImgDelete(e) {
     const arr = [...this.state.productImg.urls];
     const files = [...this.state.productImg.files];
@@ -160,26 +212,50 @@ class Propose extends Component {
       productDescription: e.target.value,
     });
   }
-  async handleCommit() {
+  async handleSave() {
+    this.props.detectAccountChange();
     const {
       productName,
       productDeadline,
       productDescription,
       productImg,
     } = this.state;
-    const formData = new FormData();
-    formData.append('productName', productName);
-    formData.append('productDeadline', productDeadline);
-    formData.append('productDescription', productDescription);
-    // TODO: producer
-    formData.append('producer', 'Karl');
-    productImg.files.forEach(file => formData.append('t', file));
-    const res = await fetch('/api/new-product', {
-      method: 'POST',
-      body: formData,
-    });
-    const message = await res.text();
-    console.log(message);
+    if (this.props.account === 'LOGIN' || this.props.account === '' || this.props.account === undefined) {
+      alert('Account error, please login to MetaMask again');
+    } else if (productName === '' || productDeadline === '') {
+      alert('Product name and deadline cannot be blank');
+    } else if (new Date(productDeadline).getTime() <= Date.now()) {
+      alert('Product deadline should be a future time point');
+    } else {
+      const formData = new FormData();
+      formData.append('productName', productName);
+      formData.append('productDeadline', productDeadline);
+      formData.append('productDescription', productDescription);
+      // TODO: producer
+      formData.append('producer', this.props.account);
+      productImg.files.forEach(file => formData.append('image', file));
+      let productId = this.props.location.pathname.split('/')[2];
+      let res;
+      if (productId.length > 0) {
+        productId = parseInt(productId, 10);
+        formData.append('productId', productId);
+        res = await fetch('/api/edit-product', {
+          method: 'POST',
+          body: formData,
+        });
+      } else {
+        res = await fetch('/api/new-product', {
+          method: 'POST',
+          body: formData,
+        });
+      }
+      const message = await res.text();
+      if (message === 'success') {
+        alert('Save success');
+      } else {
+        alert(message);
+      }
+    }
   }
   render() {
     const {
@@ -210,12 +286,19 @@ class Propose extends Component {
           </ProposeBlockDescription>
         </ProposeDetail>
         <ButtonBlock>
-          <Button>save</Button>
-          <Button onClick={this.handleCommit}>commit</Button>
+          <Button onClick={this.handleSave}>save</Button>
+          <Button>commit</Button>
         </ButtonBlock>
       </Wrapper>
     );
   }
 }
 
-export default Propose;
+Propose.propTypes = {
+  detectAccountChange: PropTypes.func.isRequired,
+  account: PropTypes.string.isRequired,
+};
+
+const ProposeRouter = withRouter(props => <Propose {...props} />);
+
+export default ProposeRouter;

@@ -47,18 +47,27 @@ const Tool = styled(Link)`
   text-decoration: none;
   font-family: 'Neucha', cursive;
   transform: scale(1.2, 1);
+  overflow: hidden;
+  max-width: 200px;
+  text-overflow: ellipsis;
   :hover {
     color: black;
     transition: .5s;
   }
 `;
 
-const Topbar = ({ location }) => (
+const Topbar = ({ location, account }) => (
   <Topbarwrapper>
     <Title to="/">PoChain</Title>
     <ToolDiv>
-      <Tool to="/propose" label="/propose/" page={location.pathname}>PROPOSE</Tool>
-      <Tool to="/login" label="/login/" page={location.pathname}>LOGIN</Tool>
+      <Tool to="/propose/" label="/propose/" page={location.pathname}>PROPOSE</Tool>
+      {
+        (account === 'LOGIN') ? (
+          <Tool to="/login/" label="/login/" page={location.pathname}>{account}</Tool>
+        ) : (
+          <Tool to={`/user/${account}/`} label={`/user/${account}/`} page={location.pathname}>{account}</Tool>
+        )
+      }
     </ToolDiv>
   </Topbarwrapper>
 );
@@ -69,6 +78,7 @@ Topbar.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired,
   }).isRequired,
+  account: PropTypes.string.isRequired,
 };
 
 export default TopbarRouter;

@@ -6,9 +6,8 @@ import { Link } from 'react-router-dom';
 import { toLocalDateString } from '../util/utils';
 
 const Productwrapper = styled(Link)`
-  width: 70%;
+  width: 100%;
   height: 300px;
-  margin: 10px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -17,10 +16,20 @@ const Productwrapper = styled(Link)`
   color: black;
 `;
 
-const ProductImg = styled.img`
+const ProductImgBox = styled.div`
   width: 250px;
   height: 250px;
   margin: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  border-radius: 15px;
+  background-color: black;
+  flex-shrink: 0;
+`;
+
+const ProductImg = styled.img`
+  width: 100%;
 `;
 
 const ProductDiscription = styled.div`
@@ -31,6 +40,7 @@ const ProductDiscription = styled.div`
   align-items: left;
   text-align: left;
   margin-left: 30px;
+  overflow: hidden;
 `;
 
 const ProductName = styled.div`
@@ -38,6 +48,9 @@ const ProductName = styled.div`
   height: 50px;
   font-size: 33px;
   font-family: 'Righteous', cursive;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const ProductOwner = styled.div`
@@ -48,6 +61,9 @@ const ProductOwner = styled.div`
   font-size: 20px;
   font-family: 'Neucha', cursive;
   letter-spacing: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const ProductDetail = styled.div`
@@ -65,9 +81,18 @@ const ProductList = ({
   producer,
   deadline,
   detail,
+  image,
 }) => (
   <Productwrapper to={`/product/${id}`}>
-    <ProductImg />
+    <ProductImgBox>
+      {
+        (image === '') ? (
+          <ProductImg />
+        ) : (
+          <ProductImg src={`data:image/png;base64,${image}`} />
+        )
+      }
+    </ProductImgBox>
     <ProductDiscription>
       <ProductName>{name}</ProductName>
       <ProductOwner>Producer: {producer}</ProductOwner>
@@ -83,6 +108,7 @@ ProductList.propTypes = {
   producer: PropTypes.string.isRequired,
   deadline: PropTypes.number.isRequired,
   detail: PropTypes.string.isRequired,
+  image: PropTypes.string.isRequired,
 };
 
 export default ProductList;

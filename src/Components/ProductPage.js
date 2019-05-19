@@ -7,7 +7,7 @@ import { toLocalDateString } from '../util/utils';
 import CommentList from './CommentList';
 
 const Wrapper = styled.div`
-  width: inherit;
+  width: 100%;
   /* text-align: center; */
   display: flex;
   flex-grow: 1;
@@ -15,6 +15,7 @@ const Wrapper = styled.div`
   padding-top: 130px;
   padding-bottom: 50px;
   align-items: center;
+  overflow: scroll;
 `;
 
 const ProductName = styled.div`
@@ -22,6 +23,7 @@ const ProductName = styled.div`
   height: 50px;
   font-size: 40px;
   font-family: 'Righteous', cursive;
+  flex-shrink: 0;
 `;
 
 const ProductBrief = styled.div`
@@ -32,12 +34,41 @@ const ProductBrief = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
+`;
+
+const ProductBox = styled.div`
+  width: 440px;
+  height: 440px;
+  margin: 10px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  background-color: black;
+  justify-content: space-around;
+  border-radius: 25px;
+  overflow: hidden;
+  flex-shrink: 0;
+`;
+
+const ImgIcon = styled.i`
+  position: absolute;
+  color: white;
+  font-size: 80px;
+  cursor: pointer;
+  color: #ffffff3b;
+  transition: .3s;
+  ${({ right }) => ((right) ? 'right: 0;' : 'left: 0;')}
+  :hover {
+    color: #ffffffcb;
+    transition: .3s;
+  }
 `;
 
 const ProductImg = styled.img`
-  width: 440px;
-  min-width: 440px;
-  margin: 10px;
+  /* max-width: 440px; */
+  width: 100%;
+  height: auto;
 `;
 
 const ProductDiscription = styled.div`
@@ -48,6 +79,7 @@ const ProductDiscription = styled.div`
   align-items: left;
   text-align: left;
   margin-left: 30px;
+  overflow: hidden;
 `;
 
 const ProductOwner = styled.div`
@@ -58,6 +90,9 @@ const ProductOwner = styled.div`
   font-size: 20px;
   font-family: 'Neucha', cursive;
   letter-spacing: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const ProductBriefDetail = styled.div`
@@ -78,6 +113,7 @@ const SplitLine = styled.hr`
   position: relative;
   background-color: #9E9E9E;
   height: 0.2px;
+  flex-shrink: 0;
 `;
 
 const Buttons = styled.div`
@@ -108,7 +144,6 @@ class ProductPage extends Component {
   constructor(props) {
     super(props);
     const { location } = this.props;
-    console.log();
     this.state = {
       id: parseInt(location.pathname.split('/')[2], 10),
       name: '',
@@ -116,7 +151,10 @@ class ProductPage extends Component {
       deadline: '',
       description: '',
       images: [],
+      imagePtr: -1,
     };
+    this.handleImgRightClick = this.handleImgRightClick.bind(this);
+    this.handleImgLeftClick = this.handleImgLeftClick.bind(this);
   }
   async componentDidMount() {
     let res = await fetch(`/api/product/${this.state.id}`);
@@ -129,10 +167,29 @@ class ProductPage extends Component {
       images.push(`data:image/png;base64,${image}`);
     }
     // console.log(imgRes);
+    let imagePtr = -1;
+    if (images.length > 0) {
+      imagePtr = 0;
+    }
     this.setState({
       ...res[0],
       images,
+      imagePtr,
     });
+  }
+  handleImgRightClick() {
+    if (this.state.imagePtr < this.state.images.length - 1) {
+      this.setState({
+        imagePtr: this.state.imagePtr + 1,
+      });
+    }
+  }
+  handleImgLeftClick() {
+    if (this.state.imagePtr > 0) {
+      this.setState({
+        imagePtr: this.state.imagePtr - 1,
+      });
+    }
   }
   render() {
     const {
@@ -141,15 +198,20 @@ class ProductPage extends Component {
       deadline,
       description,
       images,
+      imagePtr,
     } = this.state;
     return (
       <Wrapper>
         <ProductName>{name}</ProductName>
         <ProductBrief>
-          <ProductImg src={images[0]} />
+          <ProductBox>
+            <ImgIcon onClick={this.handleImgLeftClick} className="fas fa-chevron-left" />
+            <ImgIcon onClick={this.handleImgRightClick} right className="fas fa-chevron-right" />
+            <ProductImg src={images[imagePtr]} />
+          </ProductBox>
           <ProductDiscription>
-            <ProductOwner>Producer: {producer}</ProductOwner>
-            <ProductOwner>Deadline: {toLocalDateString(deadline)}</ProductOwner>
+            <ProductOwner>{`Producer: ${producer}`}</ProductOwner>
+            <ProductOwner>{`Deadline: ${toLocalDateString(deadline)}`}</ProductOwner>
             <ProductBriefDetail>{description}</ProductBriefDetail>
             <Buttons>
               <Button>Pre-order</Button>

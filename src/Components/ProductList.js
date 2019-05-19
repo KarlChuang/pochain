@@ -5,7 +5,7 @@ import fetch from 'isomorphic-fetch';
 import Product from './Product';
 
 const Wrapper = styled.div`
-  width: inherit;
+  width: 100%;
   /* text-align: center; */
   display: flex;
   flex-grow: 1;
@@ -13,6 +13,8 @@ const Wrapper = styled.div`
   padding-top: 130px;
   padding-bottom: 50px;
   align-items: center;
+  overflow: scroll;
+  height: 100%;
 `;
 
 const SplitLine = styled.hr`
@@ -27,10 +29,13 @@ const SplitLine = styled.hr`
 `;
 
 const ProductBlock = styled.div`
-  width: 100%;
+  width: 70%;
+  margin: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 400px;
+  flex-shrink: 0;
 `;
 
 class ProductList extends Component {
@@ -41,7 +46,7 @@ class ProductList extends Component {
     };
   }
   async componentDidMount() {
-    let res = await fetch('/api/all_product');
+    let res = await fetch('/api/all_products');
     res = await res.json();
     this.setState({
       products: res,
@@ -58,6 +63,7 @@ class ProductList extends Component {
             id,
             name,
             producer,
+            image,
           }, idx) => (
             <ProductBlock key={id}>
               <Product
@@ -66,6 +72,8 @@ class ProductList extends Component {
                 deadline={new Date(deadline).getTime()}
                 detail={description}
                 id={id}
+                image={(image === undefined) ?
+                  '' : btoa(String.fromCharCode.apply(null, image.image.data))}
               />
               {(idx % 2 === 0) ? (<SplitLine right />) : (<SplitLine />)}
             </ProductBlock>

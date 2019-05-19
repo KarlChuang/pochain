@@ -144,7 +144,7 @@ class Propose extends Component {
       res = await fetch(`/api/product_img/${productId}`);
       const imageResponse = await res.json();
       if (fileResponse[0].producer !== this.props.account) {
-        window.location.replace(`/user/${fileResponse[0].producer}`);
+        window.location.replace('/user/');
       } else {
         this.setState({
           productName: fileResponse[0].name,

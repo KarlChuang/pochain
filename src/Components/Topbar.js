@@ -65,7 +65,7 @@ const Topbar = ({ location, account }) => (
         (account === 'LOGIN') ? (
           <Tool to="/login/" label="login" page={location.pathname.split('/')[1]}>{account}</Tool>
         ) : (
-          <Tool to={`/user/${account}/`} label={`/user/${account}/`} page={location.pathname}>{account}</Tool>
+          <Tool to="/user/" label="/user/" page={location.pathname}>{account}</Tool>
         )
       }
     </ToolDiv>

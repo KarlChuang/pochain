@@ -51,6 +51,7 @@ const ProductName = styled.div`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  flex-shrink: 0;
 `;
 
 const ProductOwner = styled.div`
@@ -64,6 +65,7 @@ const ProductOwner = styled.div`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  flex-shrink: 0;
 `;
 
 const ProductDetail = styled.div`
@@ -73,6 +75,8 @@ const ProductDetail = styled.div`
   font-size: 20px;
   font-family: 'Neucha', cursive;
   letter-spacing: 1px;
+  overflow: scroll;
+  white-space: pre-wrap;
 `;
 
 const ProductList = ({

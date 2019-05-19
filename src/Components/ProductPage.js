@@ -57,10 +57,16 @@ const ImgIcon = styled.i`
   font-size: 80px;
   cursor: pointer;
   color: #ffffff3b;
+  height: 100%;
+  display: flex;
+  padding-left: 10px;
+  padding-right: 10px;
+  align-items: center;
   transition: .3s;
   ${({ right }) => ((right) ? 'right: 0;' : 'left: 0;')}
   :hover {
-    color: #ffffffcb;
+    background-color: #00000063;
+    color: #ffffffcf;
     transition: .3s;
   }
 `;
@@ -93,6 +99,7 @@ const ProductOwner = styled.div`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  flex-shrink: 0;
 `;
 
 const ProductBriefDetail = styled.div`
@@ -102,6 +109,9 @@ const ProductBriefDetail = styled.div`
   font-size: 20px;
   font-family: 'Neucha', cursive;
   letter-spacing: 1px;
+  white-space: pre-wrap;
+  overflow: scroll;
+  position: relative;
 `;
 
 const SplitLine = styled.hr`
@@ -123,6 +133,7 @@ const Buttons = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
+  flex-shrink: 0;
 `;
 
 const Button = styled.button`

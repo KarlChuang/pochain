@@ -252,27 +252,23 @@ class ProductPage extends Component {
   async handlePreOrder() {
     const account = await this.props.detectAccountChange();
     const { amount, id } = this.state;
-    if (amount === 0) {
-      alert('Amount should be more than 0');
+    const res = await fetch('/api/pre-order', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id,
+        amount,
+        account,
+      }),
+    });
+    const message = await res.text();
+    if (message === 'success') {
+      alert('Pre-order success');
     } else {
-      const res = await fetch('/api/pre-order', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id,
-          amount,
-          account,
-        }),
-      });
-      const message = await res.text();
-      if (message === 'success') {
-        alert('Pre-order success');
-      } else {
-        alert(message);
-      }
+      alert(message);
     }
   }
   render() {
@@ -301,7 +297,7 @@ class ProductPage extends Component {
             <ProductBriefDetail>{description}</ProductBriefDetail>
             <Buttons>
               <AmountBox>
-                <AmountInput type="number" min="0" max="10" value={amount} onChange={this.handleAmountChange} />
+                <AmountInput type="number" min="0" value={amount} onChange={this.handleAmountChange} />
                 <Button onClick={this.handlePreOrder}>Pre-order</Button>
               </AmountBox>
               {

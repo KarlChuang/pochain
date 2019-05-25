@@ -120,7 +120,10 @@ class PersonalPage extends Component {
     });
   }
   async handleProductDelete(productId) {
-    if (confirm('Delete the Product?')) {
+    const account = await this.props.detectAccountChange();
+    if (this.props.account !== account) {
+      alert('You change the account, please try again');
+    } else if (confirm('Delete the Product?')) {
       let res = await fetch('/api/delete-product', {
         method: 'POST',
         headers: {

@@ -151,6 +151,19 @@ const Button = styled.button`
   }
 `;
 
+const AmountBox = styled.div`
+  height: 35px;
+`;
+
+const AmountInput = styled.input`
+  margin-right: 10px;
+  height: 27px;
+  width: 40px;
+  border: 1px;
+  border-style: solid;
+  border-radius: 5px;
+`;
+
 const ButtonLink = styled(Link)`
   background-color: #ededed;
   font-size: 18px;
@@ -183,17 +196,23 @@ class ProductPage extends Component {
       description: '',
       images: [],
       imagePtr: -1,
+      amount: 0,
     };
     this.handleImgRightClick = this.handleImgRightClick.bind(this);
     this.handleImgLeftClick = this.handleImgLeftClick.bind(this);
+    this.handleAmountChange = this.handleAmountChange.bind(this);
+    this.handlePreOrder = this.handlePreOrder.bind(this);
   }
   async componentDidMount() {
     const { detectAccountChange } = this.props;
-    detectAccountChange();
+    const account = await detectAccountChange();
     let res = await fetch(`/api/product/${this.state.id}`);
     res = await res.json();
     let imgRes = await fetch(`/api/product_img/${this.state.id}`);
     imgRes = await imgRes.json();
+    let orderRes = await fetch(`/api/order/${this.state.id}/${account}`);
+    orderRes = await orderRes.json();
+
     const images = [];
     for (let i = 0; i < imgRes.length; i += 1) {
       const image = btoa(String.fromCharCode.apply(null, imgRes[i].image.data));
@@ -208,6 +227,7 @@ class ProductPage extends Component {
       ...res[0],
       images,
       imagePtr,
+      amount: (orderRes.length > 0) ? orderRes[0].amount : 0,
     });
   }
   handleImgRightClick() {
@@ -224,6 +244,37 @@ class ProductPage extends Component {
       });
     }
   }
+  handleAmountChange(e) {
+    this.setState({
+      amount: e.target.value,
+    });
+  }
+  async handlePreOrder() {
+    const account = await this.props.detectAccountChange();
+    const { amount, id } = this.state;
+    if (amount === 0) {
+      alert('Amount should be more than 0');
+    } else {
+      const res = await fetch('/api/pre-order', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+          amount,
+          account,
+        }),
+      });
+      const message = await res.text();
+      if (message === 'success') {
+        alert('Pre-order success');
+      } else {
+        alert(message);
+      }
+    }
+  }
   render() {
     const {
       id,
@@ -233,6 +284,7 @@ class ProductPage extends Component {
       description,
       images,
       imagePtr,
+      amount,
     } = this.state;
     return (
       <Wrapper>
@@ -248,7 +300,10 @@ class ProductPage extends Component {
             <ProductOwner>{`Deadline: ${toLocalDateString(deadline)}`}</ProductOwner>
             <ProductBriefDetail>{description}</ProductBriefDetail>
             <Buttons>
-              <Button>Pre-order</Button>
+              <AmountBox>
+                <AmountInput type="number" min="0" max="10" value={amount} onChange={this.handleAmountChange} />
+                <Button onClick={this.handlePreOrder}>Pre-order</Button>
+              </AmountBox>
               {
                 (this.props.account === producer) ? (
                   <ButtonLink to={`/propose/${id}`}>Edit</ButtonLink>

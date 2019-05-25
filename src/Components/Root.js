@@ -56,6 +56,7 @@ class Root extends Component {
           account: account[0],
         });
       }
+      return account[0];
     }
   }
   render() {

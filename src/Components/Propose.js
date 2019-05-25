@@ -54,6 +54,7 @@ const TitleInput = styled.input`
   padding-right: 10px;
   font-family: 'Neucha', cursive;
   letter-spacing: 1.5px;
+  margin-right: 10px;
 `;
 
 const ProposeBlockDescription = styled.div`
@@ -122,6 +123,7 @@ class Propose extends Component {
     this.state = {
       productName: '',
       productDeadline: '',
+      productPrice: '',
       productDescription: '',
       productImg: {
         files: [],
@@ -134,6 +136,7 @@ class Propose extends Component {
     this.handleSave = this.handleSave.bind(this);
     this.handleImgAdd = this.handleImgAdd.bind(this);
     this.handleImgDelete = this.handleImgDelete.bind(this);
+    this.handlePriceChange = this.handlePriceChange.bind(this);
   }
   async componentDidMount() {
     const { location } = this.props;
@@ -150,6 +153,7 @@ class Propose extends Component {
           productName: fileResponse[0].name,
           productDeadline: fileResponse[0].deadline.split('T')[0],
           productDescription: fileResponse[0].description,
+          productPrice: fileResponse[0].price,
         });
         const productImg = {
           files: [],
@@ -206,6 +210,11 @@ class Propose extends Component {
       productDeadline: e.target.value,
     });
   }
+  handlePriceChange(e) {
+    this.setState({
+      productPrice: e.target.value,
+    });
+  }
   handleDescriptionChange(e) {
     this.setState({
       productDescription: e.target.value,
@@ -217,6 +226,7 @@ class Propose extends Component {
       productName,
       productDeadline,
       productDescription,
+      productPrice,
       productImg,
     } = this.state;
     if (this.props.account === 'LOGIN' || this.props.account === '' || this.props.account === undefined) {
@@ -230,6 +240,7 @@ class Propose extends Component {
       formData.append('productName', productName);
       formData.append('productDeadline', productDeadline);
       formData.append('productDescription', productDescription);
+      formData.append('productPrice', productPrice);
       // TODO: producer
       formData.append('producer', this.props.account);
       productImg.files.forEach(file => formData.append('image', file));
@@ -260,6 +271,7 @@ class Propose extends Component {
     const {
       productName,
       productDeadline,
+      productPrice,
       productDescription,
       productImg,
     } = this.state;
@@ -278,6 +290,8 @@ class Propose extends Component {
           <ProposeBlock>
             <Title>Deadline</Title>
             <TitleInput type="date" onChange={this.handleDateChange} value={productDeadline} />
+            <Title>Price</Title>
+            <TitleInput onChange={this.handlePriceChange} value={productPrice} />
           </ProposeBlock>
           <ProposeBlockDescription>
             <Title>Product Description</Title>

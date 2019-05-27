@@ -73,11 +73,12 @@ const ProductIconBlock = styled(Link)`
   position: absolute;
   cursor: pointer;
   transition: .3s;
-  width: 50%;
+  /* width: 50%; */
   display: flex;
   flex-direction: row;
   text-decoration: none;
   ${({ right }) => ((right) ? 'right: 0;' : 'left: 0;')}
+  width: ${({ span }) => ((span) ? 100 : 50)}%;
 `;
 
 const ProductIcon = styled.i`
@@ -135,7 +136,6 @@ class PersonalPage extends Component {
         }),
       });
       res = await res.text();
-      console.log(res);
       if (res === 'success') {
         alert('Success');
         this.setState({
@@ -198,9 +198,13 @@ class PersonalPage extends Component {
               name,
               producer,
               images,
+              orderNum,
             }, idx) => (
               <ProductBlock key={id}>
                 <Productwrapper>
+                  <ProductIconBlock span={1} to={`/product/${id}`}>
+                    <ProductIcon>{orderNum}</ProductIcon>
+                  </ProductIconBlock>
                   <Product
                     name={name}
                     producer={producer}

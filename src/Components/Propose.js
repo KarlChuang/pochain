@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import fetch from 'isomorphic-fetch';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
+import sha256 from 'js-sha256';
 
 import ProposeImg from './ProposeImg';
 
@@ -221,7 +222,7 @@ class Propose extends Component {
     });
   }
   async handleSave() {
-    this.props.detectAccountChange();
+    const account = await this.props.detectAccountChange();
     const {
       productName,
       productDeadline,
@@ -241,9 +242,28 @@ class Propose extends Component {
       formData.append('productDeadline', productDeadline);
       formData.append('productDescription', productDescription);
       formData.append('productPrice', productPrice);
-      // TODO: producer
-      formData.append('producer', this.props.account);
+      formData.append('producer', account);
       productImg.files.forEach(file => formData.append('image', file));
+
+      // hash the data
+      console.log([
+        productName,
+        productDeadline,
+        productDescription,
+        parseInt(productPrice, 10),
+        account,
+        productImg.urls,
+      ]);
+      console.log(sha256([
+        productName,
+        productDeadline,
+        productDescription,
+        parseInt(productPrice, 10),
+        account,
+        productImg.urls,
+      ]));
+
+
       let productId = this.props.location.pathname.split('/')[2];
       let res;
       if (productId.length > 0) {

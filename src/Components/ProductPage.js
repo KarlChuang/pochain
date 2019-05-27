@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import fetch from 'isomorphic-fetch';
 import { withRouter, Link } from 'react-router-dom';
+import sha256 from 'js-sha256';
 
 import { toLocalDateString } from '../util/utils';
 import CommentList from './CommentList';
@@ -229,6 +230,24 @@ class ProductPage extends Component {
       imagePtr,
       amount: (orderRes.length > 0) ? orderRes[0].amount : 0,
     });
+
+    // check hash
+    console.log([
+      res[0].name,
+      res[0].deadline.split('T')[0],
+      res[0].description,
+      res[0].price,
+      res[0].producer,
+      images,
+    ]);
+    console.log(sha256([
+      res[0].name,
+      res[0].deadline.split('T')[0],
+      res[0].description,
+      res[0].price.toString(),
+      res[0].producer,
+      images,
+    ]));
   }
   handleImgRightClick() {
     if (this.state.imagePtr < this.state.images.length - 1) {

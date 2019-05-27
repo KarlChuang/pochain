@@ -140,13 +140,13 @@ class PersonalPage extends Component {
         alert('Success');
         this.setState({
           products: this.state.products.filter(({ id }) => id !== productId),
+          orders: this.state.orders.filter(({ id }) => id !== productId),
         });
       } else {
         alert('Unexpected error');
       }
-    } else {
-      window.location.replace('/user/');
     }
+    window.location.replace('/user/');
   }
   render() {
     const { products, orders } = this.state;

@@ -58,6 +58,7 @@ class Root extends Component {
       }
       return account[0];
     }
+    return undefined;
   }
   render() {
     const { account } = this.state;

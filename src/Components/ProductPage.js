@@ -270,29 +270,11 @@ class ProductPage extends Component {
   }
   async handlePreOrder() {
     const account = await this.props.detectAccountChange();
-    const { amount, id, blockchainId } = this.state;
-    const res = await fetch('/api/pre-order', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id,
-        amount,
-        account,
-      }),
-    });
-    const message = await res.text();
-    if (message === 'success') {
-      alert('Pre-order success');
-      console.log(blockchainId);
-      console.log(account);
-      this.props.txContract.methods.CreateTx(blockchainId)
-        .send({ from: account, value: this.props.web3.utils.toWei('0.001', 'ether') });
-    } else {
-      alert(message);
-    }
+    const { amount, blockchainId } = this.state;
+    console.log(blockchainId);
+    console.log(account);
+    this.props.txContract.methods.CreateTx(blockchainId)
+      .send({ from: account, value: this.props.web3.utils.toWei('0.001', 'ether') });
   }
   render() {
     const {

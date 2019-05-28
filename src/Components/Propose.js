@@ -120,6 +120,7 @@ class Propose extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      productId: -1,
       productName: '',
       productDeadline: '',
       productPrice: '',
@@ -133,6 +134,7 @@ class Propose extends Component {
     this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleSave = this.handleSave.bind(this);
+    this.handleCommit = this.handleCommit.bind(this);
     this.handleImgAdd = this.handleImgAdd.bind(this);
     this.handleImgDelete = this.handleImgDelete.bind(this);
     this.handlePriceChange = this.handlePriceChange.bind(this);
@@ -149,12 +151,6 @@ class Propose extends Component {
       if (fileResponse[0].producer !== account) {
         window.location.replace('/user/');
       } else {
-        this.setState({
-          productName: fileResponse[0].name,
-          productDeadline: fileResponse[0].deadline.split('T')[0],
-          productDescription: fileResponse[0].description,
-          productPrice: fileResponse[0].price,
-        });
         const productImg = {
           files: [],
           urls: [],
@@ -164,7 +160,12 @@ class Propose extends Component {
           productImg.files.push(imageResponse[i].id);
         }
         this.setState({
+          productName: fileResponse[0].name,
+          productDeadline: fileResponse[0].deadline.split('T')[0],
+          productDescription: fileResponse[0].description,
+          productPrice: fileResponse[0].price,
           productImg,
+          productId: parseInt(productId, 10),
         });
       }
     }
@@ -223,6 +224,7 @@ class Propose extends Component {
   async handleSave() {
     const account = await this.props.detectAccountChange();
     const {
+      productId,
       productName,
       productDeadline,
       productDescription,
@@ -246,7 +248,9 @@ class Propose extends Component {
         productImg.urls,
       ]);
 
+      // create form
       const formData = new FormData();
+      formData.append('productId', productId);
       formData.append('productName', productName);
       formData.append('productDeadline', productDeadline);
       formData.append('productDescription', productDescription);
@@ -255,31 +259,47 @@ class Propose extends Component {
       formData.append('hash', hash);
       productImg.files.forEach(file => formData.append('image', file));
 
-      let productId = this.props.location.pathname.split('/')[2];
-      let res;
-      if (productId.length > 0) {
-        productId = parseInt(productId, 10);
-        formData.append('productId', productId);
-        res = await fetch('/api/edit-product', {
-          method: 'POST',
-          body: formData,
-        });
-      } else {
-        // save to blockchain
-        this.props.productContract.methods.createproduct(hash, parseInt(productPrice, 10), 20).send({ from: account });
-        res = await fetch('/api/new-product', {
-          method: 'POST',
-          body: formData,
-        });
-      }
+      const res = await fetch('/api/new-product', {
+        method: 'POST',
+        body: formData,
+      });
       const fetchRes = await res.json();
       if (fetchRes.message === 'success') {
-        alert('Save to the server, please waiting for the blockchain comfirm...');
-        window.location.replace('/user/');
+        this.setState({
+          productId: parseInt(fetchRes.id, 10),
+          productImg: {
+            ...this.state.productImg,
+            files: fetchRes.imgIds,
+          },
+        });
+        alert('Save to the server!');
       } else {
         alert(fetchRes.message);
       }
     }
+  }
+  async handleCommit() {
+    await this.handleSave();
+    const account = await this.props.detectAccountChange();
+    const {
+      productName,
+      productDeadline,
+      productDescription,
+      productPrice,
+      productImg,
+    } = this.state;
+    const hash = sha256([
+      productName,
+      productDeadline,
+      productDescription,
+      parseInt(productPrice, 10),
+      account,
+      productImg.urls,
+    ]);
+    // save to blockchain
+    this.props.productContract.methods
+      .createproduct(hash, parseInt(productPrice, 10), 20)
+      .send({ from: account });
   }
   render() {
     const {
@@ -314,7 +334,7 @@ class Propose extends Component {
         </ProposeDetail>
         <ButtonBlock>
           <Button onClick={this.handleSave}>save</Button>
-          <Button>commit</Button>
+          <Button onClick={this.handleCommit}>commit</Button>
         </ButtonBlock>
       </Wrapper>
     );

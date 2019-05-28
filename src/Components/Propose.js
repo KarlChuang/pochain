@@ -119,8 +119,6 @@ const Button = styled.button`
 class Propose extends Component {
   constructor(props) {
     super(props);
-    const { detectAccountChange } = this.props;
-    detectAccountChange();
     this.state = {
       productName: '',
       productDeadline: '',
@@ -141,13 +139,14 @@ class Propose extends Component {
   }
   async componentDidMount() {
     const { location } = this.props;
+    const account = await this.props.detectAccountChange();
     const productId = location.pathname.split('/')[2];
     if (productId.length > 0) {
       let res = await fetch(`/api/product/${productId}`);
       const fileResponse = await res.json();
       res = await fetch(`/api/product_img/${productId}`);
       const imageResponse = await res.json();
-      if (fileResponse[0].producer !== this.props.account) {
+      if (fileResponse[0].producer !== account) {
         window.location.replace('/user/');
       } else {
         this.setState({
@@ -237,16 +236,8 @@ class Propose extends Component {
     } else if (new Date(productDeadline).getTime() <= Date.now()) {
       alert('Product deadline should be a future time point');
     } else {
-      const formData = new FormData();
-      formData.append('productName', productName);
-      formData.append('productDeadline', productDeadline);
-      formData.append('productDescription', productDescription);
-      formData.append('productPrice', productPrice);
-      formData.append('producer', account);
-      productImg.files.forEach(file => formData.append('image', file));
-
       // hash the data
-      console.log([
+      const hash = sha256([
         productName,
         productDeadline,
         productDescription,
@@ -254,15 +245,15 @@ class Propose extends Component {
         account,
         productImg.urls,
       ]);
-      console.log(sha256([
-        productName,
-        productDeadline,
-        productDescription,
-        parseInt(productPrice, 10),
-        account,
-        productImg.urls,
-      ]));
 
+      const formData = new FormData();
+      formData.append('productName', productName);
+      formData.append('productDeadline', productDeadline);
+      formData.append('productDescription', productDescription);
+      formData.append('productPrice', productPrice);
+      formData.append('producer', account);
+      formData.append('hash', hash);
+      productImg.files.forEach(file => formData.append('image', file));
 
       let productId = this.props.location.pathname.split('/')[2];
       let res;
@@ -274,16 +265,19 @@ class Propose extends Component {
           body: formData,
         });
       } else {
+        // save to blockchain
+        this.props.productContract.methods.createproduct(hash, parseInt(productPrice, 10), 20).send({ from: account });
         res = await fetch('/api/new-product', {
           method: 'POST',
           body: formData,
         });
       }
-      const message = await res.text();
-      if (message === 'success') {
-        alert('Save success');
+      const fetchRes = await res.json();
+      if (fetchRes.message === 'success') {
+        alert('Save to the server, please waiting for the blockchain comfirm...');
+        window.location.replace('/user/');
       } else {
-        alert(message);
+        alert(fetchRes.message);
       }
     }
   }

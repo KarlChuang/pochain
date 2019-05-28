@@ -5,7 +5,7 @@ contract poChain {
     mapping (uint => address) Id2Owner;
     mapping (uint => address) Tx2Customer;
     struct Product {
-        uint _hash;
+        string _hash;
         uint _cost;
         // initial state = target pre-order
         // _state-- if sb pre-order

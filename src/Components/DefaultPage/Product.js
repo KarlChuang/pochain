@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import { toLocalDateString } from '../util/utils';
+import { toLocalDateString } from '../../util/utils';
 
 const Productwrapper = styled(Link)`
   width: 100%;

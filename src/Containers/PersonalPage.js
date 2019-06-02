@@ -24,7 +24,7 @@ class PersonalPage extends Component {
     });
   }
   async handleProductDelete(productId) {
-    if (confirm('Delete the Product?')) {
+    this.props.handleAlert('Delete the Product?', async () => {
       // Use blockchain to delete product
       // after server detect blockchain event, delete product from database
       // let res = await fetch('/api/delete-product', {
@@ -39,15 +39,15 @@ class PersonalPage extends Component {
       // });
       // res = await res.text();
       // if (res === 'success') {
-      alert('Waiting for blockchain mining...');
-        // this.setState({
-        //   products: this.state.products.filter(({ id }) => id !== productId),
-        //   orders: this.state.orders.filter(({ id }) => id !== productId),
-        // });
+      this.props.handleAlert('Waiting for blockchain mining...');
+      // this.setState({
+      //   products: this.state.products.filter(({ id }) => id !== productId),
+      //   orders: this.state.orders.filter(({ id }) => id !== productId),
+      // });
       // } else {
       //   alert('Unexpected error');
       // }
-    }
+    });
     // window.location.replace('/user/');
   }
   render() {
@@ -64,13 +64,14 @@ class PersonalPage extends Component {
 }
 
 PersonalPage.propTypes = {
-  detectAccountChange: PropTypes.func.isRequired,
+  // detectAccountChange: PropTypes.func.isRequired,
   account: PropTypes.string.isRequired,
   productContract: PropTypes.shape({
     methods: PropTypes.shape({
       createproduct: PropTypes.func.isRequired,
     }).isRequired,
   }).isRequired,
+  handleAlert: PropTypes.func.isRequired,
 };
 
 

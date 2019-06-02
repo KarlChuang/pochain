@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import { toLocalDateString } from '../../util/utils';
 import CommentList from './CommentList';
@@ -199,6 +200,7 @@ const ProductPage = ({
   handleImgRightClick,
   handleAmountChange,
   handlePreOrder,
+  handleConfirm,
 }) => (
   <Wrapper>
     <ProductName>{name}</ProductName>
@@ -213,10 +215,16 @@ const ProductPage = ({
         <ProductOwner>{`Deadline: ${toLocalDateString(deadline)}`}</ProductOwner>
         <ProductBriefDetail>{description}</ProductBriefDetail>
         <Buttons>
-          <AmountBox>
-            <AmountInput type="number" min="0" value={amount} onChange={handleAmountChange} />
-            <Button onClick={handlePreOrder}>Pre-order</Button>
-          </AmountBox>
+          {
+            (new Date(deadline).getTime() <= new Date().getTime()) ? (
+              <Button onClick={handleConfirm}>Confirm</Button>
+            ) : (
+              <AmountBox>
+                <AmountInput type="number" min="0" value={amount} onChange={handleAmountChange} />
+                <Button onClick={handlePreOrder}>Pre-order</Button>
+              </AmountBox>
+            )
+          }
           {
             (account === producer) ? (
               <ButtonLink to={`/propose/${id}`}>Edit</ButtonLink>
@@ -229,5 +237,24 @@ const ProductPage = ({
     <CommentList />
   </Wrapper>
 );
+
+ProductPage.propTypes = {
+  topState: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    deadline: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    producer: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    imagePtr: PropTypes.number.isRequired,
+    amount: PropTypes.number.isRequired,
+    images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
+  account: PropTypes.string.isRequired,
+  handleImgLeftClick: PropTypes.func.isRequired,
+  handleImgRightClick: PropTypes.func.isRequired,
+  handleAmountChange: PropTypes.func.isRequired,
+  handlePreOrder: PropTypes.func.isRequired,
+  handleConfirm: PropTypes.func.isRequired,
+};
 
 export default ProductPage;

@@ -38,6 +38,43 @@ const ProductBlock = styled.div`
   flex-shrink: 0;
 `;
 
+const ProductWrapper = styled.div`
+  width: 100%;
+  height: 300px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: black;
+  position: relative;
+`;
+
+const ProductIconBlock = styled.div`
+  height: 100%;
+  position: absolute;
+  cursor: pointer;
+  transition: .3s;
+  display: flex;
+  flex-direction: row;
+  text-decoration: none;
+  width: 100%;
+`;
+
+const ProductIcon = styled.i`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+  color: white;
+  font-size: 50px;
+  cursor: pointer;
+  border-radius: 10px;
+  background-color: #00000077;
+  color: #ffffffaa;
+`;
+
 const ProductList = ({ products }) => (
   <Wrapper>
     {
@@ -50,15 +87,24 @@ const ProductList = ({ products }) => (
         image,
       }, idx) => (
         <ProductBlock key={id}>
-          <Product
-            name={name}
-            producer={producer}
-            deadline={new Date(deadline).getTime()}
-            detail={description}
-            id={id}
-            image={(image === undefined) ?
-              '' : btoa(String.fromCharCode.apply(null, image.image.data))}
-          />
+          <ProductWrapper>
+            {
+              (new Date(deadline).getTime() <= new Date().getTime()) ? (
+                <ProductIconBlock>
+                  <ProductIcon>Time Expired... Manufacturing</ProductIcon>
+                </ProductIconBlock>
+              ) : ''
+            }
+            <Product
+              name={name}
+              producer={producer}
+              deadline={new Date(deadline).getTime()}
+              detail={description}
+              id={id}
+              image={(image === undefined) ?
+                '' : btoa(String.fromCharCode.apply(null, image.image.data))}
+            />
+          </ProductWrapper>
           {(idx % 2 === 0) ? (<SplitLine right />) : (<SplitLine />)}
         </ProductBlock>
       ))

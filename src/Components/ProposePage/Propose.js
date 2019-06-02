@@ -5,14 +5,17 @@ import PropTypes from 'prop-types';
 import ProposeImg from './ProposeImg';
 
 const Wrapper = styled.div`
-  width: inherit;
+  /* width: inherit; */
   /* text-align: center; */
   display: flex;
   flex-grow: 1;
   flex-direction: column;
   padding-top: 130px;
   align-items: center;
-  margin-bottom: 50px;
+  /* margin-bottom: 50px; */
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
 `;
 
 const ProposeDetail = styled.div`
@@ -79,6 +82,7 @@ const DescriptionInput = styled.textarea`
 const ButtonBlock = styled(ProposeBlock)`
   justify-content: space-around;
   flex-shrink: 0;
+  margin-bottom: 50px;
 `;
 
 const Button = styled.button`
@@ -98,20 +102,6 @@ const Button = styled.button`
     transition: .3s;
   }
 `;
-
-// const AlertBox = styled.div`
-//   position: fixed;
-//   font-size: 25px;
-//   top: 40%;
-//   background-color: #21212182;
-//   color: white;
-//   padding-left: 60px;
-//   padding-right: 60px;
-//   padding-top: 6px;
-//   border-radius: 15px;
-//   font-family: 'Neucha', cursive;
-//   opacity: ${({ show }) => (show ? 1 : 0)};
-// `;
 
 const Propose = ({
   topState: {

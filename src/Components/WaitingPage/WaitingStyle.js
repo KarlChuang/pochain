@@ -93,3 +93,66 @@ export const Circle = styled(MesParent)`
     }
   }
 `;
+
+export const Alertwrapper = styled.div`
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  position: fixed;
+  font-size: 25px;
+  background-color: #000000d1;
+  height: 100%;
+  width: 100%;
+  z-index: 4000;
+`;
+
+export const AlertBox = styled.div`
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 400px;
+  height: 250px;
+  font-family: 'Neucha', cursive;
+  color: black;
+  background-color: white;
+`;
+
+export const AlertMsg = styled.div`
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex-grow: 1;
+  width: 100%;
+`;
+
+export const AlertButtonDiv = styled.div`
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  height: 50px;
+  width: 100%;
+`;
+
+export const AlertButton = styled.button`
+  width: 50%;
+  height: 100%;
+  border: 1;
+  color: white;
+  font-size: 20px;
+  background-color: ${({ sig }) => ((sig) ? '#a50303' : '#468dab')};
+  font-family: 'Neucha', cursive;
+  cursor: pointer;
+  transition: .3s;
+  :hover {
+    background-color: ${({ sig }) => ((sig) ? '#ff2f2f' : '#55ccff')};
+    transition: .3s;
+  }
+`;

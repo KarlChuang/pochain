@@ -1,6 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-import { Waitingwrapper, Font, MesChar, Message, Circle, Mes } from './WaitingStyle';
+import {
+  Waitingwrapper, Font, MesChar, Message, Circle, Mes,
+  Alertwrapper, AlertBox, AlertMsg, AlertButtonDiv, AlertButton,
+} from './WaitingStyle';
 
 const NoteMd = ['P', 'o', 'C', 'h', 'a', 'i', 'n', '.', '.', '.'];
 
@@ -29,3 +33,25 @@ export const HomeMes = () => (
     </Mes>
   </Message>
 );
+
+export const Alert = ({
+  message, handleBack, handleOK,
+}) => (
+  <Alertwrapper>
+    <AlertBox>
+      <AlertMsg>
+        { message }
+      </AlertMsg>
+      <AlertButtonDiv>
+        <AlertButton onClick={handleBack}>BACK</AlertButton>
+        <AlertButton sig onClick={handleOK}>OK</AlertButton>
+      </AlertButtonDiv>
+    </AlertBox>
+  </Alertwrapper>
+);
+
+Alert.propTypes = {
+  message: PropTypes.string.isRequired,
+  handleBack: PropTypes.func.isRequired,
+  handleOK: PropTypes.func.isRequired,
+};

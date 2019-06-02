@@ -26,6 +26,7 @@ class ProductPage extends Component {
     };
     this.handlePreOrder = this.handlePreOrder.bind(this);
     this.checkProductHash = this.checkProductHash.bind(this);
+    this.handleConfirm = this.handleConfirm.bind(this);
   }
 
   async componentDidMount() {
@@ -50,15 +51,15 @@ class ProductPage extends Component {
         status: 'finish',
       });
     } else {
-      alert('product hash error...');
+      this.props.handleAlert('Product hash error...');
     }
   }
 
   checkProductHash() {
-    console.log(this.state);
+    // console.log(this.state);
     const productHash = hashProduct(this.state);
     // TODO: check product hash from blochchain
-    console.log(productHash);
+    // console.log(productHash);
     return true;
   }
 
@@ -72,8 +73,13 @@ class ProductPage extends Component {
       this.props.txContract.methods.CreateTx(blockchainId)
         .send({ from: account, value: this.props.web3.utils.toWei('0.001', 'ether') });
     } else {
-      alert('product hash error...');
+      this.props.handleAlert('Product hash error...');
     }
+  }
+
+  async handleConfirm() {
+    // TODO: handle confirm for product getting
+    this.props.handleAlert('Confirm');
   }
 
   render() {
@@ -93,6 +99,7 @@ class ProductPage extends Component {
         }
         handleAmountChange={e => this.setState({ amount: e.target.value })}
         handlePreOrder={this.handlePreOrder}
+        handleConfirm={this.handleConfirm}
       />
     );
   }
@@ -114,6 +121,7 @@ ProductPage.propTypes = {
       toWei: PropTypes.func.isRequired,
     }).isRequired,
   }).isRequired,
+  handleAlert: PropTypes.func.isRequired,
 };
 
 const ProductPageRouter = withRouter(props => <ProductPage {...props} />);

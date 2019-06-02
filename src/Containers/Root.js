@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { BrowserRouter, Route } from 'react-router-dom';
 import Web3 from 'web3';
 
-import DefaultPage from './DefaultPage';
-import ProductPage from '../Containers/ProductPage';
-import ProposePage from '../Containers/ProposePage';
-import Login from '../Components/Topbar/Login';
-import Topbar from '../Components/Topbar/Topbar';
-import PersonalPage from './PersonalPage';
-import { Waiting } from '../Components/WaitingPage/Waiting';
+import { Waiting, Alert } from '../Components/WaitingPage/Waiting';
+import Router from '../Components/Router';
 
 import pdContractJson from '../../build/contracts/product.json';
 import txContractJson from '../../build/contracts/tx.json';
@@ -19,9 +13,11 @@ const Rootwrapper = styled.div`
   width: inherit;
   height: inherit;
   text-align: center;
+  align-items: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
 `;
 
 class Root extends Component {
@@ -33,8 +29,14 @@ class Root extends Component {
       productContract: undefined,
       txContract: undefined,
       status: 'loading',
+      alertMsg: '',
+      handleAlertBack: () => console.log('back'),
+      handleAlertOK: () => console.log('ok'),
     };
     this.detectAccountChange = this.detectAccountChange.bind(this);
+    this.handleAlert = this.handleAlert.bind(this);
+    this.handleAlertBack = this.handleAlertBack.bind(this);
+    this.handleAlertOK = this.handleAlertOK.bind(this);
   }
 
   async componentDidMount() {
@@ -45,12 +47,13 @@ class Root extends Component {
       try {
         await window.ethereum.enable();
       } catch (error) {
-        alert('Unexpected error');
+        this.handleAlert('Unexpected error');
       }
     } else if (window.web3) {
       web3js = Web3(window.web3.currentProvider);
     } else {
-      alert('Non-Ethereum browser detected. You should consider trying MetaMask!');
+      const alertMsg = 'Non-Ethereum browser detected. You should consider trying MetaMask!';
+      this.handleAlert(alertMsg);
     }
 
     if (web3js !== undefined) {
@@ -88,6 +91,37 @@ class Root extends Component {
     return undefined;
   }
 
+  handleAlert(alertMsg, handleOK = () => { }, handleBack = () => { }) {
+    this.setState({
+      status: 'alert',
+      alertMsg,
+      handleAlertBack: handleBack,
+      handleAlertOK: handleOK,
+    });
+  }
+
+  async handleAlertBack() {
+    const func = this.state.handleAlertBack();
+    this.setState({
+      status: 'finish',
+      alertMsg: '',
+      handleAlertBack: () => console.log('alert'),
+      handleAlertOK: () => console.log('ok'),
+    });
+    await func();
+  }
+
+  async handleAlertOK() {
+    const func = this.state.handleAlertOK;
+    this.setState({
+      status: 'finish',
+      alertMsg: '',
+      handleAlertBack: () => console.log('alert'),
+      handleAlertOK: () => console.log('ok'),
+    });
+    await func();
+  }
+
   render() {
     const {
       account,
@@ -95,21 +129,31 @@ class Root extends Component {
       txContract,
       web3,
       status,
+      alertMsg,
     } = this.state;
     if (status === 'loading') {
       return (<Waiting />);
     }
     return (
-      <BrowserRouter>
-        <Rootwrapper>
-          <Topbar account={account} />
-          <Route path="/" exact component={() => <DefaultPage />} />
-          <Route path="/product" component={() => <ProductPage account={account} detectAccountChange={this.detectAccountChange} txContract={txContract} web3={web3} />} />
-          <Route path="/propose" component={() => <ProposePage account={account} detectAccountChange={this.detectAccountChange} productContract={productContract} />} />
-          <Route path="/login" component={Login} />
-          <Route path="/user" component={() => <PersonalPage account={account} detectAccountChange={this.detectAccountChange} productContract={productContract} />} />
-        </Rootwrapper>
-      </BrowserRouter>
+      <Rootwrapper>
+        {
+          (status === 'alert') ? (
+            <Alert
+              message={alertMsg}
+              handleBack={this.handleAlertBack}
+              handleOK={this.handleAlertOK}
+            />
+          ) : ('')
+        }
+        <Router
+          account={account}
+          productContract={productContract}
+          txContract={txContract}
+          web3={web3}
+          detectAccountChange={this.detectAccountChange}
+          handleAlert={this.handleAlert}
+        />
+      </Rootwrapper>
     );
   }
 }

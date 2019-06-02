@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import Product from '../DefaultPage/Product';
 
@@ -191,5 +192,40 @@ const Personal = ({
     </TopBlock>
   </Wrapper>
 );
+
+Personal.propTypes = {
+  topState: PropTypes.shape({
+    products: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      deadline: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      producer: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      images: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        image: PropTypes.shape({
+          data: PropTypes.arrayOf(PropTypes.number).isRequired,
+        }).isRequired,
+      })).isRequired,
+    })).isRequired,
+    orders: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      deadline: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      producer: PropTypes.string.isRequired,
+      orderNum: PropTypes.number.isRequired,
+      version: PropTypes.number.isRequired,
+      orderVer: PropTypes.number.isRequired,
+      images: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        image: PropTypes.shape({
+          data: PropTypes.arrayOf(PropTypes.number).isRequired,
+        }).isRequired,
+      })).isRequired,
+    })).isRequired,
+  }).isRequired,
+  handleProductDelete: PropTypes.func.isRequired,
+};
 
 export default Personal;

@@ -38,7 +38,7 @@ class ProposePage extends Component {
       fileResponse = await fileResponse.json();
       // check producer
       if (fileResponse.producer !== account) {
-        alert('You are not the producer');
+        this.props.handleAlert('You are not the producer');
         window.location.replace('/user/');
       } else {
         const productImg = {
@@ -103,17 +103,17 @@ class ProposePage extends Component {
       productPrice, productBaseline, productImg,
     } = this.state;
     if (this.props.account === 'LOGIN' || this.props.account === '' || this.props.account === undefined) {
-      alert('Account error, please login to MetaMask again');
+      this.props.handleAlert('Account error, please login to MetaMask again');
     } else if (productName === '') {
-      alert('Product name cannot be blank');
+      this.props.handleAlert('Product name cannot be blank');
     } else if (productDeadline === '') {
-      alert('Product deadline cannot be blank');
+      this.props.handleAlert('Product deadline cannot be blank');
     } else if (productBaseline === '') {
-      alert('Product baseline cannot be blank');
+      this.props.handleAlert('Product baseline cannot be blank');
     } else if (productPrice === '') {
-      alert('Product price cannot be blank');
+      this.props.handleAlert('Product price cannot be blank');
     } else if (new Date(productDeadline).getTime() <= Date.now()) {
-      alert('Product deadline should be a future time point');
+      this.props.handleAlert('Product deadline should be a future time point');
     } else {
       // hash the product
       const hash = hashProduct({
@@ -151,9 +151,9 @@ class ProposePage extends Component {
             files: fetchRes.imgIds,
           },
         });
-        alert('Save to the server!');
+        this.props.handleAlert('Save to the server!');
       } else {
-        alert(fetchRes.message);
+        this.props.handleAlert(fetchRes.message);
       }
     }
   }
@@ -220,6 +220,7 @@ ProposePage.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired,
   }).isRequired,
+  handleAlert: PropTypes.func.isRequired,
 };
 
 const ProposeRouter = withRouter(props => <ProposePage {...props} />);

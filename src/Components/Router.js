@@ -36,8 +36,9 @@ class Router extends Component {
   render() {
     const {
       account,
-      productContract,
-      txContract,
+      // productContract,
+      // txContract,
+      pochainContract,
       web3,
       detectAccountChange,
       handleAlert,
@@ -53,7 +54,8 @@ class Router extends Component {
               <ProductPage
                 account={account}
                 detectAccountChange={detectAccountChange}
-                txContract={txContract}
+                // txContract={txContract}
+                pochainContract={pochainContract}
                 web3={web3}
                 handleAlert={handleAlert}
               />
@@ -65,7 +67,9 @@ class Router extends Component {
               <ProposePage
                 account={account}
                 detectAccountChange={detectAccountChange}
-                productContract={productContract}
+                // productContract={productContract}
+                pochainContract={pochainContract}
+                web3={web3}
                 handleAlert={handleAlert}
               />
             )}
@@ -77,7 +81,8 @@ class Router extends Component {
               <PersonalPage
                 account={account}
                 detectAccountChange={detectAccountChange}
-                productContract={productContract}
+                // productContract={productContract}
+                pochainContract={pochainContract}
                 handleAlert={handleAlert}
               />
             )}
@@ -90,19 +95,15 @@ class Router extends Component {
 
 Router.propTypes = {
   account: PropTypes.string.isRequired,
-  txContract: PropTypes.shape({
+  pochainContract: PropTypes.shape({
     methods: PropTypes.shape({
       CreateTx: PropTypes.func.isRequired,
+      createproduct: PropTypes.func.isRequired,
     }).isRequired,
   }).isRequired,
   web3: PropTypes.shape({
     utils: PropTypes.shape({
       toWei: PropTypes.func.isRequired,
-    }).isRequired,
-  }).isRequired,
-  productContract: PropTypes.shape({
-    methods: PropTypes.shape({
-      createproduct: PropTypes.func.isRequired,
     }).isRequired,
   }).isRequired,
   detectAccountChange: PropTypes.func.isRequired,

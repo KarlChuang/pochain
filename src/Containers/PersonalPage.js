@@ -66,7 +66,7 @@ class PersonalPage extends Component {
 PersonalPage.propTypes = {
   // detectAccountChange: PropTypes.func.isRequired,
   account: PropTypes.string.isRequired,
-  productContract: PropTypes.shape({
+  pochainContract: PropTypes.shape({
     methods: PropTypes.shape({
       createproduct: PropTypes.func.isRequired,
     }).isRequired,

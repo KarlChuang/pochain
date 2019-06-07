@@ -175,16 +175,20 @@ class ProposePage extends Component {
       images: productImg.urls,
     });
 
-    // TODO: save to blockchain
+    // TODO: save to blockchain (Solved)
+    const timestamp = new Date(productDeadline).getTime() / 1000;
+    const baseline = parseInt(productBaseline, 10);
     if (blockchainId === -1) {
-      this.props.productContract.methods
-        .createproduct(hash, parseInt(productPrice, 10), 20)
-        .send({ from: account });
+      console.log(timestamp);
+      this.props.pochainContract.methods
+        .createproduct(hash, parseInt(productPrice, 10), baseline, timestamp)
+        .send({ from: account, value: this.props.web3.utils.toWei((0.001 * (baseline + 2)).toString(), 'ether') });
     } else {
       // TODO: change the product on blockchain
-      this.props.productContract.methods
-        .createproduct(hash, parseInt(productPrice, 10), 20)
-        .send({ from: account });
+      console.log(blockchainId);
+      this.props.pochainContract.methods
+        .editproduct(blockchainId, hash, parseInt(productPrice, 10), baseline, timestamp)
+        .send({ from: account, value: this.props.web3.utils.toWei((0.001 * (baseline + 2)).toString(), 'ether') });
     }
   }
 
@@ -212,7 +216,7 @@ class ProposePage extends Component {
 ProposePage.propTypes = {
   detectAccountChange: PropTypes.func.isRequired,
   account: PropTypes.string.isRequired,
-  productContract: PropTypes.shape({
+  pochainContract: PropTypes.shape({
     methods: PropTypes.shape({
       createproduct: PropTypes.func.isRequired,
     }).isRequired,

@@ -17,7 +17,7 @@ contract product is Ownable {
     }
     Product[] public products;
 
-    mapping (uint => address) Id2Owner;
+    mapping (uint => address payable) Id2Owner;
 
     event productCreated(uint _productId, string _hash, uint _cost, uint _goal, uint deadline);
     event productEdited(uint _productId, string _hash, uint _cost, uint _goal, uint deadline);
@@ -28,12 +28,12 @@ contract product is Ownable {
     }
 
     function _editproduct(uint Id, string memory _hash, uint _cost, uint _goal, uint deadline) internal {
-        Product storage product_to_be_edit = products[Id];
-        product_to_be_edit._hash = _hash;
-        product_to_be_edit._cost = _cost;
-        product_to_be_edit._state = 1;
-        product_to_be_edit._goal = _goal;
-        product_to_be_edit.deadline = deadline;
+        // Product storage product_to_be_edit = products[Id];
+        products[Id]._hash = _hash;
+        products[Id]._cost = _cost;
+        products[Id]._state = 1;
+        products[Id]._goal = _goal;
+        products[Id].deadline = deadline;
         emit productEdited(Id, _hash, _cost, _goal, deadline);
     }
 

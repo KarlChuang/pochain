@@ -1,16 +1,15 @@
 //var Ownable = artifacts.require("Ownable");
 var product = artifacts.require("product");
-var tx = artifacts.require("tx");
+var Transaction = artifacts.require("Transaction");
 var poChain = artifacts.require("poChain");
 
 module.exports = function(deployer) {
     //deployer.deploy(Ownable);
     //deployer.link(Ownable,[product,tx]);
     deployer.deploy(product);
-    deployer.deploy(tx);
+    deployer.deploy(Transaction);
     deployer.link(product, poChain);
-    deployer.link(tx, poChain);
+    deployer.link(Transaction, poChain);
     //deployer.link(poChain,tx)
     deployer.deploy(poChain);
-
 }

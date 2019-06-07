@@ -1,8 +1,8 @@
 pragma solidity >=0.4.21 <0.6.0;
 import "./product.sol";
-import "./tx.sol";
+import "./Transaction.sol";
 
-contract poChain is tx, product{
+contract poChain is Transaction, product {
 
     uint randNounce = 0;
     constructor() public {
@@ -11,22 +11,22 @@ contract poChain is tx, product{
     //Product here
     /*********************************************************
     *********************************************************/
-    function createproduct(string memory _hash, uint _cost, uint _state, uint _goal, uint deadline) public payable {
-        require(msg.value == (_goal+1)*(1 finney), "must reserve exactly _state wei");
-        _createproduct(_hash, _cost, _state, deadline);
+    function createproduct(string memory _hash, uint _cost, uint _goal, uint _deadline) public payable {
+        require(msg.value == ((_goal + 2) * (1 finney)), "must reserve exactly _goal+2 finney");
+        _createproduct(_hash, _cost, _goal, _deadline);
     }
 
-    function editproduct(uint Id, string memory _hash, uint _cost, uint _state, uint _goal, uint D) public payable {
+    function editproduct(uint Id, string memory _hash, uint _cost, uint _goal, uint _deadline) public payable {
         //(,,oldstate) = _getproduct(Id);
         require(msg.sender == Id2Owner[Id], "CANT ACCESS");
-        require(msg.value == (_goal+2)*(1 finney), "value must equal with _goal+2");
+        require(msg.value == (_goal+2)*(1 finney), "value must equal with _goal+2 finney");
         require(Id <= products.length, "product Id not found");
         require(products[Id]._state > 0, "product deleted");
-        _editproduct(Id, _hash, _cost, _state, D);
-        (address[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(Id);
-        for(uint i = 0; i < len; i++) {
-            Found[i].transfer(Amount[i]*1 finney);
-        }
+        _editproduct(Id, _hash, _cost, _goal, _deadline);
+        (address payable[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(Id);
+        // for(uint i = 0; i < len; i++) {
+        //     Found[i].transfer(Amount[i]*1 finney);
+        // }
     }
 
     function DLC(uint Id, uint deadline) public view returns(bool) {
@@ -69,11 +69,10 @@ contract poChain is tx, product{
     // }
 
     function _targetfailed(uint Id) private {
-        (address[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(Id);
+        (address payable[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(Id);
         for(uint i = 0; i < len; i++) {
             Found[i].transfer((Amount[i]*products[Id]._cost+1)*1 finney);
         }
-        
     }
 
     //Tx here
@@ -86,7 +85,7 @@ contract poChain is tx, product{
         require(now <= products[_ProductId].deadline, "pre-order ended");
         require(msg.value == products[_ProductId]._cost*amount, "Not enough balance!!");
         _createtx(_ProductId, amount);
-        products[_ProductId]._state -= 1;
+        products[_ProductId]._state += amount;
 
     }
 
@@ -102,8 +101,8 @@ contract poChain is tx, product{
         (,uint oldamount) = _gettx(TxId);
         _edittx(TxId, amount);
         msg.sender.transfer(oldamount*products[_ProductId]._cost*1 finney);
-        products[_ProductId]._state -= amount;
-
+        products[_ProductId]._state -= oldamount;
+        products[_ProductId]._state += amount;
     }
 
     function getproduct(uint Id) public view returns(string memory, uint, uint, uint, uint) {

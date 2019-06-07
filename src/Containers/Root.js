@@ -5,8 +5,9 @@ import Web3 from 'web3';
 import { Waiting, Alert } from '../Components/WaitingPage/Waiting';
 import Router from '../Components/Router';
 
-import pdContractJson from '../../build/contracts/product.json';
-import txContractJson from '../../build/contracts/tx.json';
+// import pdContractJson from '../../build/contracts/product.json';
+// import txContractJson from '../../build/contracts/tx.json';
+import poChainJson from '../../build/contracts/poChain.json';
 import smConfig from '../../config/smartContract';
 
 const Rootwrapper = styled.div`
@@ -59,8 +60,9 @@ class Root extends Component {
     if (web3js !== undefined) {
       // account detection and smart contract initialization
       const account = await web3js.eth.getAccounts();
-      const productContract = new web3js.eth.Contract(pdContractJson.abi, smConfig.product);
-      const txContract = new web3js.eth.Contract(txContractJson.abi, smConfig.tx);
+      const pochainContract = new web3js.eth.Contract(poChainJson.abi, smConfig.pochain);
+      // const productContract = new web3js.eth.Contract(pdContractJson.abi, smConfig.product);
+      // const txContract = new web3js.eth.Contract(txContractJson.abi, smConfig.tx);
 
       // setInterval for account detection
       setInterval(() => this.detectAccountChange(), 100);
@@ -69,8 +71,9 @@ class Root extends Component {
       this.setState({
         web3: web3js,
         account: account[0],
-        productContract,
-        txContract,
+        // productContract,
+        // txContract,
+        pochainContract,
         status: 'finish',
       });
     }
@@ -125,8 +128,7 @@ class Root extends Component {
   render() {
     const {
       account,
-      productContract,
-      txContract,
+      pochainContract,
       web3,
       status,
       alertMsg,
@@ -147,8 +149,9 @@ class Root extends Component {
         }
         <Router
           account={account}
-          productContract={productContract}
-          txContract={txContract}
+          // productContract={productContract}
+          // txContract={txContract}
+          pochainContract={pochainContract}
           web3={web3}
           detectAccountChange={this.detectAccountChange}
           handleAlert={this.handleAlert}

@@ -70,7 +70,7 @@ class ProductPage extends Component {
       // console.log(blockchainId);
       // console.log(account);
       // TODO: fulfill the ordering function
-      this.props.txContract.methods.CreateTx(blockchainId)
+      this.props.pochainContract.methods.CreateTx(blockchainId)
         .send({ from: account, value: this.props.web3.utils.toWei('0.001', 'ether') });
     } else {
       this.props.handleAlert('Product hash error...');
@@ -111,7 +111,7 @@ ProductPage.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired,
   }).isRequired,
-  txContract: PropTypes.shape({
+  pochainContract: PropTypes.shape({
     methods: PropTypes.shape({
       CreateTx: PropTypes.func.isRequired,
     }).isRequired,

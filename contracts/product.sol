@@ -13,33 +13,38 @@ contract product is Ownable {
         // _state == 0, delete
         uint _state;
         uint _goal;
-        uint deadline;
+        uint _deadline;
+        bool _deadlinecheck;
     }
     Product[] public products;
 
     mapping (uint => address payable) Id2Owner;
 
-    event productCreated(uint _productId, string _hash, uint _cost, uint _goal, uint deadline);
-    event productEdited(uint _productId, string _hash, uint _cost, uint _goal, uint deadline);
-    function _createproduct(string memory _hash, uint _cost, uint _goal, uint deadline) internal {
-        uint id = products.push(Product(_hash, _cost,1,_goal, deadline))-1;
-        Id2Owner[id] = msg.sender;
-        emit productCreated(id, _hash, _cost, _goal, deadline);
+    event productCreated(uint _productId, string _hash, uint _cost, uint _goal, uint deadline, address producer);
+    event productEdited(uint _oldId, uint _productId, string _hash, uint _cost, uint _goal, uint deadline, address producer);
+    event productDeleted(uint _productId);
+
+    function _createproduct(string memory _hash, uint _cost, uint _goal, uint _deadline, address payable producer) internal {
+        uint id = products.push(Product(_hash, _cost, 0, _goal, _deadline, false)) - 1;
+        Id2Owner[id] = producer;
+        emit productCreated(id, _hash, _cost, _goal, _deadline, producer);
     }
 
-    function _editproduct(uint Id, string memory _hash, uint _cost, uint _goal, uint deadline) internal {
-        // Product storage product_to_be_edit = products[Id];
-        products[Id]._hash = _hash;
-        products[Id]._cost = _cost;
-        products[Id]._state = 1;
-        products[Id]._goal = _goal;
-        products[Id].deadline = deadline;
-        emit productEdited(Id, _hash, _cost, _goal, deadline);
+    function _deleteproduct(uint Id) internal {
+        products[Id]._goal = 0;
+        emit productDeleted(Id);
+    }
+
+    function _editproduct(uint _oldId, string memory _hash, uint _cost, uint _goal, uint _deadline, address payable producer) internal {
+        products[_oldId]._goal = 0;
+        uint newId = products.push(Product(_hash, _cost, 0, _goal, _deadline, false)) - 1;
+        Id2Owner[newId] = producer;
+        emit productEdited(_oldId, newId, _hash, _cost, _goal, _deadline, producer);
     }
 
     function _getproduct(uint Id) internal view returns (string memory, uint, uint, uint, uint) {
         Product storage asked_product = products[Id];
-        return  (asked_product._hash, asked_product._cost, asked_product._state, asked_product._goal, asked_product.deadline);
+        return  (asked_product._hash, asked_product._cost, asked_product._state, asked_product._goal, asked_product._deadline);
     }
 
 

@@ -9,11 +9,11 @@
     "lint": "eslint .",
     "build": "webpack",
     "test": "truffle test",
+    "clean": "rm -r ./build/contracts/*.json",
     "build:watch": "yarn build --watch",
     "build:production": "NODE_ENV=production webpack; babel lib -d dist/lib",
     "compile": "truffle compile",
-    "migrate": "rm -r ./build/contracts/*.json; truffle migrate --compile-all --reset",
-    "clean": ""
+    "migrate": "rm -r ./build/contracts/*.json; truffle migrate --compile-all --reset"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

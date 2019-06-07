@@ -179,16 +179,14 @@ class ProposePage extends Component {
     const timestamp = new Date(productDeadline).getTime() / 1000;
     const baseline = parseInt(productBaseline, 10);
     if (blockchainId === -1) {
-      console.log(timestamp);
       this.props.pochainContract.methods
         .createproduct(hash, parseInt(productPrice, 10), baseline, timestamp)
-        .send({ from: account, value: this.props.web3.utils.toWei((0.001 * (baseline + 2)).toString(), 'ether') });
+        .send({ from: account, value: this.props.web3.utils.toWei((baseline + 2).toString(), 'finney') });
     } else {
-      // TODO: change the product on blockchain
-      console.log(blockchainId);
+      // TODO: change the product on blockchain (solved)
       this.props.pochainContract.methods
         .editproduct(blockchainId, hash, parseInt(productPrice, 10), baseline, timestamp)
-        .send({ from: account, value: this.props.web3.utils.toWei((0.001 * (baseline + 2)).toString(), 'ether') });
+        .send({ from: account, value: this.props.web3.utils.toWei((baseline + 2).toString(), 'finney') });
     }
   }
 

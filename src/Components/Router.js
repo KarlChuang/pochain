@@ -81,8 +81,8 @@ class Router extends Component {
               <PersonalPage
                 account={account}
                 detectAccountChange={detectAccountChange}
-                // productContract={productContract}
                 pochainContract={pochainContract}
+                web3={web3}
                 handleAlert={handleAlert}
               />
             )}

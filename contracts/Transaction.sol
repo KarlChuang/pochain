@@ -17,11 +17,13 @@ contract Transaction is Ownable {
 
     mapping (uint => address payable) Tx2Customer;
 
-    event TxCreated(uint TxId, uint _ProductId, uint amount);
+    event TxCreated(uint TxId, uint _ProductId, address customer);
+    event TxEditted(uint TxId, uint _ProductId, address customer);
+
     function _createtx(uint _ProductId, uint amount, address payable customer) internal{
         uint id = txs.push(transaction(_ProductId, amount, false))-1;
         Tx2Customer[id] = customer;
-        emit TxCreated(id, _ProductId,amount);
+        emit TxCreated(id, _ProductId, customer);
     }
 
     function _GoThoughTxById(uint ProductId) internal view returns(address payable[] memory, uint[] memory, uint len) {
@@ -40,6 +42,7 @@ contract Transaction is Ownable {
 
     function _edittx(uint Id, uint amount) internal {
         txs[Id]._amount = amount;
+        emit TxEditted(Id, txs[Id]._ProductId, Tx2Customer[Id]);
     }
 
     function _gettx(uint Id) internal view returns (uint, uint, bool) {

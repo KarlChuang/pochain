@@ -31,8 +31,8 @@ contract poChain is Transaction, product {
     }
 
     function deleteProduct(uint Id) public {
-        require(msg.sender == Id2Owner[Id], "poChain Error: cannot access");
         require(Id < products.length, "poChain Error: product Id not found");
+        require(msg.sender == Id2Owner[Id], "poChain Error: cannot access");
         require(products[Id]._goal > 0, "poChain Error: product deleted");
         _deleteproduct(Id);
         (address payable[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(Id);
@@ -124,11 +124,20 @@ contract poChain is Transaction, product {
 
     function gettx(uint Id) public view returns(uint, uint, bool) {
         require(Id < txs.length, "poChain Error: tx does not exist");
-        return(_gettx(Id));
-        // return txid, amount, ispaid
+        require(msg.sender == Tx2Customer[Id], "poChain Error: Cannot access tx");
+        return _gettx(Id);
+        // return productid, amount, ispaid
     }
 
     function getTxLength() public view returns(uint) {
         return txs.length;
+    }
+
+    function txalive(uint TxId) public view returns(bool) {
+        require(TxId < txs.length, "poChain Error: tx does not exist");
+        require(msg.sender == Tx2Customer[TxId], "poChain Error: Cannot access tx");
+        (uint productId,,) = _gettx(TxId);
+        (,,, uint goal,) = _getproduct(productId);
+        return (goal > 0);
     }
 }

@@ -13,6 +13,7 @@ class ProductPage extends Component {
     this.state = {
       id: parseInt(this.props.location.pathname.split('/')[2], 10),
       blockchainId: -1,
+      txId: -1,
       name: '',
       producer: '',
       deadline: '',
@@ -39,12 +40,23 @@ class ProductPage extends Component {
     });
 
     // TODO: Fetch order numbers from the blockchain
-    // let orderRes = await fetch(`/api/order/${this.state.id}/${this.props.account}`);
-    // orderRes = await orderRes.json();
+    let amount = 0;
+    let txId = -1;
+    let orderRes = await fetch(`/api/order/${res.blockchainId}/${this.props.account}`);
+    orderRes = await orderRes.json();
+    if (orderRes.length > 0) {
+      txId = orderRes[0].id;
+      const txDetail = await this.props.pochainContract.methods.gettx(txId).call();
+      const {
+        1: { _hex: amountHex},
+      } = txDetail;
+      amount = parseInt(amountHex, 16);
+    }
     this.setState({
       ...res,
       imagePtr: (res.images.length > 0) ? 0 : -1,
-      amount: 0,
+      amount,
+      txId,
     });
     if (this.checkProductHash()) {
       this.setState({
@@ -55,23 +67,28 @@ class ProductPage extends Component {
     }
   }
 
-  checkProductHash() {
-    // console.log(this.state);
+  async checkProductHash() {
     const productHash = hashProduct(this.state);
-    // TODO: check product hash from blochchain
-    // console.log(productHash);
-    return true;
+    const { blockchainId } = this.state;
+    const productDetail = await this.props.pochainContract.methods.getproduct(blockchainId).call();
+    return (productDetail[0] === productHash);
   }
 
   async handlePreOrder() {
     const account = await this.props.detectAccountChange();
     if (this.checkProductHash()) {
-      const { /* amount, */blockchainId } = this.state;
-      // console.log(blockchainId);
-      // console.log(account);
-      // TODO: fulfill the ordering function
-      this.props.pochainContract.methods.CreateTx(blockchainId)
-        .send({ from: account, value: this.props.web3.utils.toWei('0.001', 'ether') });
+      const { amount, blockchainId, price, txId } = this.state;
+      const productHash = hashProduct(this.state);
+      if (txId === -1 || !await this.props.pochainContract.methods.txalive(txId).call()) {
+        // TODO: fulfill the ordering function
+        this.props.pochainContract.methods
+          .CreateTx(blockchainId, amount, productHash)
+          .send({ from: account, value: this.props.web3.utils.toWei((price * amount).toString(), 'finney') });
+      } else {
+        this.props.pochainContract.methods
+          .EditTx(blockchainId, txId, amount, productHash)
+          .send({ from: account, value: this.props.web3.utils.toWei((price * amount).toString(), 'finney') });
+      }
     } else {
       this.props.handleAlert('Product hash error...');
     }
@@ -79,7 +96,14 @@ class ProductPage extends Component {
 
   async handleConfirm() {
     // TODO: handle confirm for product getting
-    this.props.handleAlert('Confirm');
+    const account = await this.props.detectAccountChange();
+    const { blockchainId, txId } = this.state;
+    this.props.handleAlert('Confirm', () => {
+      console.log('confirm');
+      this.props.pochainContract.methods
+        .CustomerRCVed(blockchainId, txId)
+        .send({ from: account });
+    });
   }
 
   render() {
@@ -97,7 +121,7 @@ class ProductPage extends Component {
         handleImgLeftClick={() => this.setState(({ imagePtr }) =>
           ((imagePtr > 0) ? ({ imagePtr: imagePtr - 1 }) : ({})))
         }
-        handleAmountChange={e => this.setState({ amount: e.target.value })}
+        handleAmountChange={e => this.setState({ amount: parseInt(e.target.value, 10) })}
         handlePreOrder={this.handlePreOrder}
         handleConfirm={this.handleConfirm}
       />

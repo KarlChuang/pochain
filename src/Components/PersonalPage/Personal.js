@@ -125,13 +125,14 @@ const Personal = ({
           name,
           producer,
           images,
+          blockchainId,
         }, idx) => (
           <ProductBlock key={id}>
             <Productwrapper>
               <ProductIconBlock to={`/propose/${id}`}>
                 <ProductIcon className="fas fa-edit" />
               </ProductIconBlock>
-              <ProductIconBlock right={1} to="/user/" onClick={() => handleProductDelete(id)}>
+              <ProductIconBlock right={1} to="/user/" onClick={() => handleProductDelete(blockchainId)}>
                 <ProductIcon className="fas fa-trash-alt" />
               </ProductIconBlock>
               <Product
@@ -160,16 +161,15 @@ const Personal = ({
           name,
           producer,
           images,
-          orderNum,
-          version,
-          orderVer,
+          amount,
+          txalive,
         }, idx) => (
           <ProductBlock key={id}>
             <Productwrapper>
               <ProductIconBlock span={1} to={`/product/${id}`}>
                 {
-                  (version === orderVer) ? (
-                    <ProductIcon>{orderNum}</ProductIcon>
+                  (txalive === true) ? (
+                    <ProductIcon>{amount}</ProductIcon>
                   ) : (
                     <ProductIconNoHover>Product Updated!</ProductIconNoHover>
                   )
@@ -214,9 +214,8 @@ Personal.propTypes = {
       description: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       producer: PropTypes.string.isRequired,
-      orderNum: PropTypes.number.isRequired,
-      version: PropTypes.number.isRequired,
-      orderVer: PropTypes.number.isRequired,
+      amount: PropTypes.number.isRequired,
+      txalive: PropTypes.bool.isRequired,
       images: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.number.isRequired,
         image: PropTypes.shape({

@@ -17,6 +17,16 @@ class PersonalPage extends Component {
   async componentDidMount() {
     let res = await fetch(`/api/user/${this.props.account}`);
     res = await res.json();
+    for (let i = 0; i < res.orders.length; i += 1) {
+      const { txId } = res.orders[i];
+      // console.log(txId);
+      const txDetail = await this.props.pochainContract.methods.gettx(txId).call();
+      const txalive = await this.props.pochainContract.methods.txalive(txId).call();
+      const { 1: { _hex: amountHex } } = txDetail;
+      const amount = parseInt(amountHex, 16);
+      res.orders[i].amount = amount;
+      res.orders[i].txalive = txalive;
+    }
     this.setState({
       products: res.products,
       orders: res.orders,
@@ -24,31 +34,16 @@ class PersonalPage extends Component {
     });
   }
   async handleProductDelete(productId) {
+    const account = await this.props.detectAccountChange();
+    console.log(productId);
     this.props.handleAlert('Delete the Product?', async () => {
-      // Use blockchain to delete product
-      // after server detect blockchain event, delete product from database
-      // let res = await fetch('/api/delete-product', {
-      //   method: 'POST',
-      //   headers: {
-      //     Accept: 'application/json',
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     productId,
-      //   }),
-      // });
-      // res = await res.text();
-      // if (res === 'success') {
-      this.props.handleAlert('Waiting for blockchain mining...');
-      // this.setState({
-      //   products: this.state.products.filter(({ id }) => id !== productId),
-      //   orders: this.state.orders.filter(({ id }) => id !== productId),
-      // });
-      // } else {
-      //   alert('Unexpected error');
-      // }
+      this.props.pochainContract.methods
+        .deleteProduct(productId)
+        .send({ from: account });
+      this.props.handleAlert('Waiting for blockchain mining...', () => {
+        window.location.reload();
+      });
     });
-    // window.location.replace('/user/');
   }
   render() {
     if (this.state.status === 'loading') {
@@ -64,7 +59,7 @@ class PersonalPage extends Component {
 }
 
 PersonalPage.propTypes = {
-  // detectAccountChange: PropTypes.func.isRequired,
+  detectAccountChange: PropTypes.func.isRequired,
   account: PropTypes.string.isRequired,
   pochainContract: PropTypes.shape({
     methods: PropTypes.shape({

@@ -85,8 +85,10 @@ class Root extends Component {
     if (this.state.web3 !== undefined) {
       const account = await this.state.web3.eth.getAccounts();
       if (account[0] !== this.state.account) {
+        // const pochainContract = new this.state.web3.eth.Contract(poChainJson.abi, smConfig.pochain);
         this.setState({
           account: account[0],
+          // pochainContract,
         });
       }
       return account[0];

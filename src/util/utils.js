@@ -22,7 +22,10 @@ export const hashProduct = ({
   hashStr = `${hashStr}${sha256(price.toString())}`;
   hashStr = `${hashStr}${sha256(producer)}`;
   hashStr = `${hashStr}${sha256(baseline.toString())}`;
-  images.forEach((url) => { hashStr = `${hashStr}${sha256(url)}`; });
+  images.forEach((url) => {
+    const hashUrl = url.split(';base64,')[1];
+    hashStr = `${hashStr}${sha256(hashUrl)}`;
+  });
   const productHash = sha256(hashStr);
   return productHash;
 };

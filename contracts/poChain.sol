@@ -92,6 +92,7 @@ contract poChain is Transaction, product {
     }
 
     function CustomerRCVed(uint Id, uint TxId) public {
+        require(msg.sender == Tx2Customer[TxId], "poChain Error: permission denied");
         require(txs[TxId]._isPaid == false, "poChain Error: tx is paid");
         txs[TxId]._isPaid = true;
         Id2Owner[Id].transfer((txs[TxId]._amount*products[Id]._cost)*1 finney);

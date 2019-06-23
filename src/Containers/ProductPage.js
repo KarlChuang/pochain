@@ -46,9 +46,9 @@ class ProductPage extends Component {
     orderRes = await orderRes.json();
     if (orderRes.length > 0) {
       txId = orderRes[0].id;
-      const txDetail = await this.props.pochainContract.methods.gettx(txId).call();
+      const txDetail = await this.props.pochainContract.methods.gettx(txId).call({ from: this.props.account });
       const {
-        1: { _hex: amountHex},
+        1: { _hex: amountHex },
       } = txDetail;
       amount = parseInt(amountHex, 16);
     }
@@ -70,16 +70,17 @@ class ProductPage extends Component {
   async checkProductHash() {
     const productHash = hashProduct(this.state);
     const { blockchainId } = this.state;
-    const productDetail = await this.props.pochainContract.methods.getproduct(blockchainId).call();
+    const productDetail = await this.props.pochainContract.methods.getproduct(blockchainId).call({ from: this.props.account });
     return (productDetail[0] === productHash);
   }
 
   async handlePreOrder() {
     const account = await this.props.detectAccountChange();
-    if (this.checkProductHash()) {
+    if (await this.checkProductHash()) {
       const { amount, blockchainId, price, txId } = this.state;
       const productHash = hashProduct(this.state);
-      if (txId === -1 || !await this.props.pochainContract.methods.txalive(txId).call()) {
+
+      if (txId === -1 || !await this.props.pochainContract.methods.txalive(txId).call({ from: this.props.account })) {
         // TODO: fulfill the ordering function
         this.props.pochainContract.methods
           .CreateTx(blockchainId, amount, productHash)

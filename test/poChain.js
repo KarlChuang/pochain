@@ -57,16 +57,28 @@ contract('poChain', (accounts) => {
     const hash = '543211f0a641985466116b784b9cd22df769c28634da90b4f0d9491590ff516b';
     const cost = 10;
     const amount = 10;
-    await pc.CreateTx(3, amount, hash, { from: accounts[0], value: web3.utils.toWei((amount * cost).toString(), 'finney') });
+    await pc.CreateTx(3, amount, hash, { from: accounts[1], value: web3.utils.toWei((amount * cost).toString(), 'finney') });
     assert.equal(1, 1, 'tx create error');
   });
 
+  // it('producer view tx', async () => {
+  //   const pc = await poChain.deployed();
+  //   console.log(accounts[0]);
+  //   console.log(accounts[1]);
+  //   let tx0 = await pc.gettx.call(0);
+  //   console.log(tx0);
+  //   assert.equal(tx0[2], false, 'tx ispaid error 1');
+  //   // await pc.CustomerRCVed(3, 0, { from: accounts[0] });
+  //   // tx0 = await pc.gettx.call(0);
+  //   // assert.equal(tx0[2], true, 'tx ispaid error 2');
+  // });
+
   it('CustomerRCVed check', async () => {
     const pc = await poChain.deployed();
-    let tx0 = await pc.gettx.call(0);
+    let tx0 = await pc.gettx.call(0, { from: accounts[1] });
     assert.equal(tx0[2], false, 'tx ispaid error 1');
-    await pc.CustomerRCVed(3, 0, { from: accounts[0] });
-    tx0 = await pc.gettx.call(0);
+    await pc.CustomerRCVed(3, 0, { from: accounts[1] });
+    tx0 = await pc.gettx.call(0, { from: accounts[1] });
     assert.equal(tx0[2], true, 'tx ispaid error 2');
   });
 
@@ -75,8 +87,8 @@ contract('poChain', (accounts) => {
     const cost = 10;
     const newAmount = 5;
     const hash = '543211f0a641985466116b784b9cd22df769c28634da90b4f0d9491590ff516b';
-    await pc.EditTx(3, 0, newAmount, hash, { from: accounts[0], value: web3.utils.toWei((newAmount * cost).toString(), 'finney') });
-    const tx0 = await pc.gettx.call(0);
+    await pc.EditTx(3, 0, newAmount, hash, { from: accounts[1], value: web3.utils.toWei((newAmount * cost).toString(), 'finney') });
+    const tx0 = await pc.gettx.call(0, { from: accounts[1] });
     assert.equal(tx0[1], 5, 'tx amount error');
   });
 

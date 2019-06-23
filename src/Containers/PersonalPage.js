@@ -20,8 +20,8 @@ class PersonalPage extends Component {
     for (let i = 0; i < res.orders.length; i += 1) {
       const { txId } = res.orders[i];
       // console.log(txId);
-      const txDetail = await this.props.pochainContract.methods.gettx(txId).call();
-      const txalive = await this.props.pochainContract.methods.txalive(txId).call();
+      const txDetail = await this.props.pochainContract.methods.gettx(txId).call({ from: this.props.account });
+      const txalive = await this.props.pochainContract.methods.txalive(txId).call({ from: this.props.account });
       const { 1: { _hex: amountHex } } = txDetail;
       const amount = parseInt(amountHex, 16);
       res.orders[i].amount = amount;

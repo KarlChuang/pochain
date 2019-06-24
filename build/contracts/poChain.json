@@ -24230,12 +24230,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x503a66ED9D6b0e382dAF2E91aeF4d4477D32af9b",
-      "transactionHash": "0x15162374cdf10263926f70657553f14eb13634e1af3e3e35b166c286f7cf0c1b"
+      "address": "0xc87A861874cee5dc6Af2fE7b1422AC238524A26D",
+      "transactionHash": "0x3eeab3e0d5c17b53e1064bca50d407d3ab80c3c7f8edc1e196dd04031de501bd"
     }
   },
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-06-23T04:04:03.737Z",
+  "updatedAt": "2019-06-24T05:16:07.469Z",
   "devdoc": {
     "methods": {
       "isOwner()": {

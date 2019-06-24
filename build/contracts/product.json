@@ -5939,12 +5939,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x2B3eeC6b352d4D425E9C0F514706B68DeB1B6775",
-      "transactionHash": "0x955bbca25583411a05c05069d27d51c1b0ba1247650d2e60db5816a6df0d9fac"
+      "address": "0xa9F6B8c38C41Eaa158529412877Ce18F4a5f0799",
+      "transactionHash": "0x3ac8f99afb0a3f8799eacc1e38def9fb7bcf17a1b5ee9373d0667b7d05733a57"
     }
   },
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-06-23T04:04:03.519Z",
+  "updatedAt": "2019-06-24T05:16:07.065Z",
   "devdoc": {
     "methods": {
       "isOwner()": {

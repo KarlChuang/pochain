@@ -1,8 +1,16 @@
 import sha256 from 'js-sha256';
 
+const FormatNumberLength = (num, length) => {
+  let r = num.toString();
+  while (r.length < length) {
+    r = `0${r}`;
+  }
+  return r;
+};
+
 export const toLocalDateString = (timestamp) => {
   const date = new Date(timestamp);
-  const timestr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+  const timestr = `${date.getFullYear()}-${FormatNumberLength(date.getMonth() + 1, 2)}-${FormatNumberLength(date.getDate(), 2)}`;
   // timestr += `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
   return timestr;
 };

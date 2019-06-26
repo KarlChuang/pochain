@@ -132,7 +132,7 @@ const Personal = ({
               <ProductIconBlock to={`/propose/${id}`}>
                 <ProductIcon className="fas fa-edit" />
               </ProductIconBlock>
-              <ProductIconBlock right={1} to="/user/" onClick={() => handleProductDelete(blockchainId)}>
+              <ProductIconBlock right={1} to="/user/" onClick={() => handleProductDelete(blockchainId, id)}>
                 <ProductIcon className="fas fa-trash-alt" />
               </ProductIconBlock>
               <Product

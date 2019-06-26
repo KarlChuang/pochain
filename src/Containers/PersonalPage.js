@@ -33,16 +33,32 @@ class PersonalPage extends Component {
       status: 'finish',
     });
   }
-  async handleProductDelete(productId) {
+  async handleProductDelete(blochchainId, productId) {
     const account = await this.props.detectAccountChange();
-    console.log(productId);
     this.props.handleAlert('Delete the Product?', async () => {
-      this.props.pochainContract.methods
-        .deleteProduct(productId)
-        .send({ from: account });
-      this.props.handleAlert('Waiting for blockchain mining...', () => {
-        window.location.reload();
-      });
+      if (blochchainId >= 0) {
+        this.props.pochainContract.methods
+          .deleteProduct(blochchainId)
+          .send({ from: account })
+          .on('confirmation', async () => {
+            this.props.handleAlert('Product deleted from blockchain, you can delete again to delete from database', () => {
+              window.location.reload();
+            });
+          });
+      } else {
+        const formData = new FormData();
+        formData.append('productId', productId);
+        let res = await fetch('/api/delete-product', {
+          method: 'POST',
+          body: formData,
+        });
+        res = await res.text();
+        if (res === 'success') {
+          this.props.handleAlert('Product deleted', () => {
+            window.location.reload();
+          });
+        }
+      }
     });
   }
   render() {

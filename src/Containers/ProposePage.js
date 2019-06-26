@@ -97,6 +97,7 @@ class ProposePage extends Component {
   }
 
   async handleSave() {
+    let err = false;
     const account = await this.props.detectAccountChange();
     const {
       productId, productName, productDeadline, productDescription,
@@ -104,16 +105,22 @@ class ProposePage extends Component {
     } = this.state;
     if (this.props.account === 'LOGIN' || this.props.account === '' || this.props.account === undefined) {
       this.props.handleAlert('Account error, please login to MetaMask again');
+      err = true;
     } else if (productName === '') {
       this.props.handleAlert('Product name cannot be blank');
+      err = true;
     } else if (productDeadline === '') {
       this.props.handleAlert('Product deadline cannot be blank');
+      err = true;
     } else if (productBaseline === '') {
       this.props.handleAlert('Product baseline cannot be blank');
+      err = true;
     } else if (productPrice === '') {
       this.props.handleAlert('Product price cannot be blank');
+      err = true;
     } else if (new Date(productDeadline).getTime() <= Date.now()) {
       this.props.handleAlert('Product deadline should be a future time point');
+      err = true;
     } else {
       // hash the product
       const hash = hashProduct({
@@ -154,39 +161,43 @@ class ProposePage extends Component {
         this.props.handleAlert('Save to the server!');
       } else {
         this.props.handleAlert(fetchRes.message);
+        err = true;
       }
     }
+    return err;
   }
 
   async handleCommit() {
-    await this.handleSave();
-    const account = await this.props.detectAccountChange();
-    const {
-      productName, productDeadline, productDescription,
-      productPrice, productBaseline, productImg, blockchainId,
-    } = this.state;
-    const hash = hashProduct({
-      name: productName,
-      deadline: productDeadline,
-      description: productDescription,
-      price: parseInt(productPrice, 10),
-      producer: account,
-      baseline: productBaseline,
-      images: productImg.urls,
-    });
+    const err = await this.handleSave();
+    if (!err) {
+      const account = await this.props.detectAccountChange();
+      const {
+        productName, productDeadline, productDescription,
+        productPrice, productBaseline, productImg, blockchainId,
+      } = this.state;
+      const hash = hashProduct({
+        name: productName,
+        deadline: productDeadline,
+        description: productDescription,
+        price: parseInt(productPrice, 10),
+        producer: account,
+        baseline: productBaseline,
+        images: productImg.urls,
+      });
 
-    // TODO: save to blockchain (Solved)
-    const timestamp = new Date(productDeadline).getTime() / 1000;
-    const baseline = parseInt(productBaseline, 10);
-    if (blockchainId === -1) {
-      this.props.pochainContract.methods
-        .createproduct(hash, parseInt(productPrice, 10), baseline, timestamp)
-        .send({ from: account, value: this.props.web3.utils.toWei((baseline + 2).toString(), 'finney') });
-    } else {
-      // TODO: change the product on blockchain (solved)
-      this.props.pochainContract.methods
-        .editproduct(blockchainId, hash, parseInt(productPrice, 10), baseline, timestamp)
-        .send({ from: account, value: this.props.web3.utils.toWei((baseline + 2).toString(), 'finney') });
+      // TODO: save to blockchain (Solved)
+      const timestamp = new Date(productDeadline).getTime() / 1000;
+      const baseline = parseInt(productBaseline, 10);
+      if (blockchainId === -1) {
+        this.props.pochainContract.methods
+          .createproduct(hash, parseInt(productPrice, 10), baseline, timestamp)
+          .send({ from: account, value: this.props.web3.utils.toWei((baseline + 2).toString(), 'finney') });
+      } else {
+        // TODO: change the product on blockchain (solved)
+        this.props.pochainContract.methods
+          .editproduct(blockchainId, hash, parseInt(productPrice, 10), baseline, timestamp)
+          .send({ from: account, value: this.props.web3.utils.toWei((baseline + 2).toString(), 'finney') });
+      }
     }
   }
 

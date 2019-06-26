@@ -95,7 +95,8 @@ contract poChain is Transaction, product {
         require(products[_ProductId]._goal > 0, "poChain Error: Deleted Product");
         require(keccak256(abi.encodePacked(products[_ProductId]._hash)) == keccak256(abi.encodePacked(hash)), "poChain Error: corrupted data");
         require(now < products[_ProductId]._deadline, "poChain Error: pre-order ended");
-        require(msg.value == products[_ProductId]._cost * amount * 1 finney, "poChain Error: Not enough balance!!");
+        require(msg.value == (products[_ProductId]._cost * amount + 2) * 1 finney,
+         "poChain Error: Not enough balance, should at least cost*amount+2!!");
         _createtx(_ProductId, amount, msg.sender);
         products[_ProductId]._state += amount;
 
@@ -106,6 +107,7 @@ contract poChain is Transaction, product {
         require(txs[TxId]._isPaid == false, "poChain Error: tx is paid");
         txs[TxId]._isPaid = true;
         Id2Owner[Id].transfer((txs[TxId]._amount*products[Id]._cost)*1 finney);
+        msg.sender.transfer(2 finney);
     }
 
     function EditTx(uint _ProductId, uint TxId ,uint amount, string memory hash) public payable {
@@ -115,10 +117,11 @@ contract poChain is Transaction, product {
         require(products[_ProductId]._goal > 0, "poChain Error: deleted product");
         require(keccak256(abi.encodePacked(products[_ProductId]._hash)) == keccak256(abi.encodePacked(hash)), "poChain Error: corrupted data");
         require(now < products[_ProductId]._deadline, "poChain Error: pre-order ended");
-        require(msg.value == products[_ProductId]._cost * amount * 1 finney, "poChain Error: Not enough balance!!");
+        require(msg.value == (products[_ProductId]._cost * amount + 2) * 1 finney,
+         "poChain Error: Not enough balance, should at least cost*amount+2!!");
         (,uint oldamount,) = _gettx(TxId);
         _edittx(TxId, amount);
-        msg.sender.transfer(oldamount*products[_ProductId]._cost*1 finney);
+        msg.sender.transfer((oldamount*products[_ProductId]._cost + 2)*1 finney);
         products[_ProductId]._state -= oldamount;
         products[_ProductId]._state += amount;
     }

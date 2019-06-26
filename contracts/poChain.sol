@@ -22,6 +22,8 @@ contract poChain is Transaction, product {
 
     function editproduct(uint _oldId, string memory _hash, uint _cost, uint _goal, uint _deadline) public payable {
         require(msg.sender == Id2Owner[_oldId], "poChain Error: cannot access");
+        require(products[_oldId]._deadlinecheck == false, "poChain Error: cannot edit after manufacture confirmed");
+        require(now <= _deadline, "poChain Error: deadline set in past");
         require(msg.value == (_goal*3+2)*(1 finney), "poChain Error: value must equal with _goal*3+2 finney");
         require(_oldId < products.length, "poChain Error: product old Id not found");
         require(products[_oldId]._goal > 0, "poChain Error: product deleted");
@@ -40,6 +42,7 @@ contract poChain is Transaction, product {
         require(Id < products.length, "poChain Error: product Id not found");
         require(msg.sender == Id2Owner[Id], "poChain Error: cannot access");
         require(products[Id]._goal > 0, "poChain Error: product deleted");
+        require(products[Id]._deadlinecheck == false, "poChain Error: cannot delete after manufacture confirmed");
         _deleteproduct(Id);
         (address payable[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(Id);
         uint dep = products[Id]._goal*3+2;

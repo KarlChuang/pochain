@@ -15,6 +15,8 @@ contract poChain is Transaction, product {
 
     function createproduct(string memory _hash, uint _cost, uint _goal, uint _deadline) public payable {
         require(msg.value == ((_goal + 2) * (1 finney)), "poChain Error: must reserve exactly _goal+2 finney");
+        // ver_2
+        require(now <= _deadline, "poChain Error: deadline set in past");
         _createproduct(_hash, _cost, _goal, _deadline, msg.sender);
     }
 
@@ -25,8 +27,12 @@ contract poChain is Transaction, product {
         require(products[_oldId]._goal > 0, "poChain Error: product deleted");
         _editproduct(_oldId, _hash, _cost, _goal, _deadline, msg.sender);
         (address payable[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(_oldId);
+        uint dep = products[_oldId]._goal+2;
         for(uint i = 0; i < len; i++) {
-            Found[i].transfer(Amount[i]*1 finney);
+            // ver_2
+            Found[i].transfer((Amount[i]*products[_oldId]._cost+1)*1 finney);
+            dep -= (Amount[i]*products[_oldId]._cost+1)*1;
+            msg.sender.transfer(dep);
         }
     }
 
@@ -36,8 +42,12 @@ contract poChain is Transaction, product {
         require(products[Id]._goal > 0, "poChain Error: product deleted");
         _deleteproduct(Id);
         (address payable[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(Id);
+        uint dep = products[Id]._goal+2;
         for(uint i = 0; i < len; i++) {
-            Found[i].transfer(Amount[i]*1 finney);
+            // ver_2
+            Found[i].transfer((Amount[i]*products[Id]._cost+1)*1 finney);
+            dep -= (Amount[i]*products[Id]._cost+1)*1;
+            msg.sender.transfer(dep);
         }
     }
 

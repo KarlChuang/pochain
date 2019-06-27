@@ -27,15 +27,21 @@ contract poChain is Transaction, product {
         require(msg.value == (_goal*3+2)*(1 finney), "poChain Error: value must equal with _goal*3+2 finney");
         require(_oldId < products.length, "poChain Error: product old Id not found");
         require(products[_oldId]._goal > 0, "poChain Error: product deleted");
-        _editproduct(_oldId, _hash, _cost, _goal, _deadline, msg.sender);
         (address payable[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(_oldId);
         uint dep = products[_oldId]._goal*3+2;
         for(uint i = 0; i < len; i++) {
             // ver_2
-            Found[i].transfer((Amount[i]*products[_oldId]._cost+3)*1 finney);
-            dep -= (Amount[i]*products[_oldId]._cost+3)*1;
-            msg.sender.transfer(dep);
+            if (dep >= 3) {
+                Found[i].transfer((Amount[i]*products[_oldId]._cost+5)*(1 finney));
+                dep -= 3;
+            } else {
+                Found[i].transfer((Amount[i]*products[_oldId]._cost+2+dep)*(1 finney));
+            }
         }
+        if (dep > 0) {
+            msg.sender.transfer(dep*(1 finney));
+        }
+        _editproduct(_oldId, _hash, _cost, _goal, _deadline, msg.sender);
     }
 
     function deleteProduct(uint Id) public {
@@ -43,15 +49,21 @@ contract poChain is Transaction, product {
         require(msg.sender == Id2Owner[Id], "poChain Error: cannot access");
         require(products[Id]._goal > 0, "poChain Error: product deleted");
         require(products[Id]._deadlinecheck == false, "poChain Error: cannot delete after manufacture confirmed");
-        _deleteproduct(Id);
         (address payable[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(Id);
         uint dep = products[Id]._goal*3+2;
         for(uint i = 0; i < len; i++) {
             // ver_2
-            Found[i].transfer((Amount[i]*products[Id]._cost+3)*1 finney);
-            dep -= (Amount[i]*products[Id]._cost+3)*1;
-            msg.sender.transfer(dep);
+            if (dep >= 3) {
+                Found[i].transfer((Amount[i]*products[Id]._cost+5)*(1 finney));
+                dep -= 3;
+            } else {
+                Found[i].transfer((Amount[i]*products[Id]._cost+2+dep)*(1 finney));
+            }
         }
+        if (dep > 0) {
+            msg.sender.transfer(dep*(1 finney));
+        }
+        _deleteproduct(Id);
     }
 
     function deadlinePass(uint Id) public view returns(bool) {
@@ -73,21 +85,23 @@ contract poChain is Transaction, product {
         require(products[Id]._goal > 0, "poChain Error: product deleted");
         require(products[Id]._deadlinecheck == false, "poChain Error: deadline checked");
         require(now >= products[Id]._deadline, "poChain Error: deadline is not reached");
-        msg.sender.transfer(2 finney);
+        msg.sender.transfer(2*(1 finney));
         products[Id]._deadlinecheck = true;
         if(products[Id]._state < products[Id]._goal) {
             _targetfailed(Id);
             emit deadlineChecked(Id, false);
         } else {
             emit deadlineChecked(Id, true);
+            Id2Owner[Id].transfer((products[Id]._goal*3)*(1 finney));
         }
     }
 
     function _targetfailed(uint Id) private {
         (address payable[] memory Found, uint[] memory Amount, uint len) = _GoThoughTxById(Id);
         for(uint i = 0; i < len; i++) {
-            Found[i].transfer((Amount[i]*products[Id]._cost+1)*1 finney);
+            Found[i].transfer((Amount[i]*products[Id]._cost+2)*(1 finney));
         }
+        Id2Owner[Id].transfer((products[Id]._goal*3)*(1 finney));
     }
 
     //Tx here
@@ -98,7 +112,7 @@ contract poChain is Transaction, product {
         require(products[_ProductId]._goal > 0, "poChain Error: Deleted Product");
         require(keccak256(abi.encodePacked(products[_ProductId]._hash)) == keccak256(abi.encodePacked(hash)), "poChain Error: corrupted data");
         require(now < products[_ProductId]._deadline, "poChain Error: pre-order ended");
-        require(msg.value == (products[_ProductId]._cost * amount + 2) * 1 finney,
+        require(msg.value == (products[_ProductId]._cost * amount + 2) * (1 finney),
          "poChain Error: Not enough balance, should at least cost*amount+2!!");
         _createtx(_ProductId, amount, msg.sender);
         products[_ProductId]._state += amount;
@@ -109,8 +123,8 @@ contract poChain is Transaction, product {
         require(msg.sender == Tx2Customer[TxId], "poChain Error: permission denied");
         require(txs[TxId]._isPaid == false, "poChain Error: tx is paid");
         txs[TxId]._isPaid = true;
-        Id2Owner[Id].transfer((txs[TxId]._amount*products[Id]._cost)*1 finney);
-        msg.sender.transfer(2 finney);
+        Id2Owner[Id].transfer((txs[TxId]._amount*products[Id]._cost)*(1 finney));
+        msg.sender.transfer(2*(1 finney));
     }
 
     function EditTx(uint _ProductId, uint TxId ,uint amount, string memory hash) public payable {
@@ -120,11 +134,11 @@ contract poChain is Transaction, product {
         require(products[_ProductId]._goal > 0, "poChain Error: deleted product");
         require(keccak256(abi.encodePacked(products[_ProductId]._hash)) == keccak256(abi.encodePacked(hash)), "poChain Error: corrupted data");
         require(now < products[_ProductId]._deadline, "poChain Error: pre-order ended");
-        require(msg.value == (products[_ProductId]._cost * amount + 2) * 1 finney,
+        require(msg.value == (products[_ProductId]._cost * amount + 2) * (1 finney),
          "poChain Error: Not enough balance, should at least cost*amount+2!!");
         (,uint oldamount,) = _gettx(TxId);
         _edittx(TxId, amount);
-        msg.sender.transfer((oldamount*products[_ProductId]._cost + 2)*1 finney);
+        msg.sender.transfer((oldamount*products[_ProductId]._cost + 2)*(1 finney));
         products[_ProductId]._state -= oldamount;
         products[_ProductId]._state += amount;
     }

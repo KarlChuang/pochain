@@ -84,11 +84,11 @@ class ProductPage extends Component {
         // TODO: fulfill the ordering function
         this.props.pochainContract.methods
           .CreateTx(blockchainId, amount, productHash)
-          .send({ from: account, value: this.props.web3.utils.toWei((price * amount).toString(), 'finney') });
+          .send({ from: account, value: this.props.web3.utils.toWei(((price * amount) + 2).toString(), 'finney') });
       } else {
         this.props.pochainContract.methods
           .EditTx(blockchainId, txId, amount, productHash)
-          .send({ from: account, value: this.props.web3.utils.toWei((price * amount).toString(), 'finney') });
+          .send({ from: account, value: this.props.web3.utils.toWei(((price * amount) + 2).toString(), 'finney') });
       }
     } else {
       this.props.handleAlert('Product hash error...');

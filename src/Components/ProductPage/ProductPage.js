@@ -194,6 +194,8 @@ const ProductPage = ({
     images,
     imagePtr,
     amount,
+    baseline,
+    price,
   },
   account,
   handleImgLeftClick,
@@ -212,6 +214,8 @@ const ProductPage = ({
       </ProductBox>
       <ProductDiscription>
         <ProductOwner>{`Producer: ${producer}`}</ProductOwner>
+        <ProductOwner>{`Price: ${price}`}</ProductOwner>
+        <ProductOwner>{`Baseline: ${baseline}`}</ProductOwner>
         <ProductOwner>{`Deadline: ${toLocalDateString(deadline)}`}</ProductOwner>
         <ProductBriefDetail>{description}</ProductBriefDetail>
         <Buttons>
